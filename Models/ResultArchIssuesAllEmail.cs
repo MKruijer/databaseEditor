@@ -7,7 +7,7 @@ public partial class ResultArchIssuesAllEmail
 {
     public string IssueKey { get; set; } = null!;
 
-    public long EmailId { get; set; }
+    public int EmailId { get; set; }
 
     public decimal? Similarity { get; set; }
 

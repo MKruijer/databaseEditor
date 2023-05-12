@@ -6,9 +6,9 @@ namespace databaseEditor.Models;
 
 public partial class DataEmailEmail
 {
-    public long Id { get; set; }
+    public int Id { get; set; }
 
-    public long? ParentId { get; set; }
+    public int? ParentId { get; set; }
 
     public string? MessageId { get; set; }
 
@@ -29,6 +29,8 @@ public partial class DataEmailEmail
     public string? BodyParsed { get; set; }
 
     public int? ThreadId { get; set; }
+
+    public long? WordCount { get; set; }
 
     public virtual ICollection<ResultArchEmailsAllIssue> ResultArchEmailsAllIssues { get; set; } = new List<ResultArchEmailsAllIssue>();
 

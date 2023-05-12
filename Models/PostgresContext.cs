@@ -33,6 +33,10 @@ public partial class PostgresContext : DbContext
 
     public virtual DbSet<DataJiraJiraIssueComment> DataJiraJiraIssueComments { get; set; }
 
+    public virtual DbSet<ModifiedArchEmailsAllIssue> ModifiedArchEmailsAllIssues { get; set; }
+
+    public virtual DbSet<ModifiedArchIssuesAllEmail> ModifiedArchIssuesAllEmails { get; set; }
+
     public virtual DbSet<ResultArchEmailsAllIssue> ResultArchEmailsAllIssues { get; set; }
 
     public virtual DbSet<ResultArchIssuesAllEmail> ResultArchIssuesAllEmails { get; set; }
@@ -153,6 +157,7 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.SentFrom).HasColumnName("sent_from");
             entity.Property(e => e.Subject).HasColumnName("subject");
             entity.Property(e => e.ThreadId).HasColumnName("thread_id");
+            entity.Property(e => e.WordCount).HasColumnName("word_count");
 
             entity.HasMany(d => d.Tags).WithMany(p => p.Emails)
                 .UsingEntity<Dictionary<string, object>>(
@@ -169,7 +174,7 @@ public partial class PostgresContext : DbContext
                     {
                         j.HasKey("EmailId", "TagId").HasName("email_tag_pkey");
                         j.ToTable("data_email_email_tag");
-                        j.IndexerProperty<long>("EmailId").HasColumnName("email_id");
+                        j.IndexerProperty<int>("EmailId").HasColumnName("email_id");
                         j.IndexerProperty<int>("TagId").HasColumnName("tag_id");
                     });
         });
@@ -200,6 +205,7 @@ public partial class PostgresContext : DbContext
                 .HasColumnName("created");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.DescriptionSummaryVector).HasColumnName("description_summary_vector");
+            entity.Property(e => e.DescriptionWordCount).HasColumnName("description_word_count");
             entity.Property(e => e.IsCatExecutive).HasColumnName("is_cat_executive");
             entity.Property(e => e.IsCatExistence).HasColumnName("is_cat_existence");
             entity.Property(e => e.IsCatProperty).HasColumnName("is_cat_property");
@@ -226,6 +232,60 @@ public partial class PostgresContext : DbContext
                 .HasForeignKey(d => d.IssueKey)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("jira_issue_comment_issue_key_fkey");
+        });
+
+        modelBuilder.Entity<ModifiedArchEmailsAllIssue>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("modified_arch_emails_all_issues");
+
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailBody).HasColumnName("email_body");
+            entity.Property(e => e.EmailDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("email_date");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.IssueCreated)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_created");
+            entity.Property(e => e.IssueDescription).HasColumnName("issue_description");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueModified)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_modified");
+            entity.Property(e => e.IssueSummary).HasColumnName("issue_summary");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+        });
+
+        modelBuilder.Entity<ModifiedArchIssuesAllEmail>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("modified_arch_issues_all_emails");
+
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailBody).HasColumnName("email_body");
+            entity.Property(e => e.EmailDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("email_date");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.IssueCreated)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_created");
+            entity.Property(e => e.IssueDescription).HasColumnName("issue_description");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueModified)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_modified");
+            entity.Property(e => e.IssueSummary).HasColumnName("issue_summary");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
         });
 
         modelBuilder.Entity<ResultArchEmailsAllIssue>(entity =>

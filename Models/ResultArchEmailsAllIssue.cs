@@ -5,7 +5,7 @@ namespace databaseEditor.Models;
 
 public partial class ResultArchEmailsAllIssue
 {
-    public long EmailId { get; set; }
+    public int EmailId { get; set; }
 
     public string IssueKey { get; set; } = null!;
 

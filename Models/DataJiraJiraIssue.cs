@@ -26,6 +26,8 @@ public partial class DataJiraJiraIssue
 
     public DateTime? Modified { get; set; }
 
+    public long? DescriptionWordCount { get; set; }
+
     public virtual ICollection<DataJiraJiraIssueComment> DataJiraJiraIssueComments { get; set; } = new List<DataJiraJiraIssueComment>();
 
     public virtual ICollection<ResultArchEmailsAllIssue> ResultArchEmailsAllIssues { get; set; } = new List<ResultArchEmailsAllIssue>();
