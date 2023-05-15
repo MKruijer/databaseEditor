@@ -26,4 +26,6 @@ public partial class AnalysisArchIssuesAllEmail
     public string? OpenCoding { get; set; }
 
     public int Id { get; set; }
+
+    public virtual ICollection<AnalysisAxialCode> AxialCodes { get; set; } = new List<AnalysisAxialCode>();
 }

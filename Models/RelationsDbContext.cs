@@ -4,24 +4,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace databaseEditor.Models;
 
-public partial class PostgresContext : DbContext
+public partial class RelationsDbContext : DbContext
 {
-    public PostgresContext()
+    public RelationsDbContext()
     {
     }
 
-    public PostgresContext(DbContextOptions<PostgresContext> options)
+    public RelationsDbContext(DbContextOptions<RelationsDbContext> options)
         : base(options)
     {
     }
 
     public virtual DbSet<AnalysisArchEmailsAllIssue> AnalysisArchEmailsAllIssues { get; set; }
 
-    public virtual DbSet<AnalysisArchEmailsAllIssuesAxialCoding> AnalysisArchEmailsAllIssuesAxialCodings { get; set; }
-
     public virtual DbSet<AnalysisArchIssuesAllEmail> AnalysisArchIssuesAllEmails { get; set; }
-
-    public virtual DbSet<AnalysisArchIssuesAllEmailsAxialCoding> AnalysisArchIssuesAllEmailsAxialCodings { get; set; }
 
     public virtual DbSet<AnalysisAxialCode> AnalysisAxialCodes { get; set; }
 
@@ -43,28 +39,24 @@ public partial class PostgresContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Database=postgres;Username=postgres;Password=UnsavePassword");
+        => optionsBuilder.UseNpgsql("Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .HasPostgresExtension("pg_catalog", "adminpack")
-            .HasPostgresExtension("tablefunc");
+        modelBuilder.HasPostgresExtension("tablefunc");
 
         modelBuilder.Entity<AnalysisArchEmailsAllIssue>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("analysis_arch_emails_all_issues");
+            entity.HasKey(e => e.Id).HasName("analysis_arch_emails_all_issues_pk");
 
+            entity.ToTable("analysis_arch_emails_all_issues");
+
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.EmailBody).HasColumnName("email_body");
             entity.Property(e => e.EmailDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("email_date");
             entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.Id)
-                .ValueGeneratedOnAdd()
-                .HasColumnName("id");
             entity.Property(e => e.IssueCreated)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_created");
@@ -76,32 +68,39 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.IssueSummary).HasColumnName("issue_summary");
             entity.Property(e => e.OpenCoding).HasColumnName("open_coding");
             entity.Property(e => e.Similarity).HasColumnName("similarity");
-        });
 
-        modelBuilder.Entity<AnalysisArchEmailsAllIssuesAxialCoding>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("analysis_arch_emails_all_issues_axial_coding");
-
-            entity.Property(e => e.AxialCode).HasColumnName("axial_code");
-            entity.Property(e => e.EmailIssueId).HasColumnName("email_issue_id");
+            entity.HasMany(d => d.AxialCodes).WithMany(p => p.EmailIssues)
+                .UsingEntity<Dictionary<string, object>>(
+                    "AnalysisArchEmailsAllIssuesAxialCoding",
+                    r => r.HasOne<AnalysisAxialCode>().WithMany()
+                        .HasForeignKey("AxialCode")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("analysis_arch_emails_all_issues_axial_coding_axial_code_fkey"),
+                    l => l.HasOne<AnalysisArchEmailsAllIssue>().WithMany()
+                        .HasForeignKey("EmailIssueId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("analysis_arch_emails_all_issues_axial_codin_email_issue_id_fkey"),
+                    j =>
+                    {
+                        j.HasKey("EmailIssueId", "AxialCode").HasName("analysis_arch_emails_all_issues_axial_coding_pkey");
+                        j.ToTable("analysis_arch_emails_all_issues_axial_coding");
+                        j.IndexerProperty<int>("EmailIssueId").HasColumnName("email_issue_id");
+                        j.IndexerProperty<string>("AxialCode").HasColumnName("axial_code");
+                    });
         });
 
         modelBuilder.Entity<AnalysisArchIssuesAllEmail>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("analysis_arch_issues_all_emails");
+            entity.HasKey(e => e.Id).HasName("analysis_arch_issues_all_emails_pk");
 
+            entity.ToTable("analysis_arch_issues_all_emails");
+
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.EmailBody).HasColumnName("email_body");
             entity.Property(e => e.EmailDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("email_date");
             entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.Id)
-                .ValueGeneratedOnAdd()
-                .HasColumnName("id");
             entity.Property(e => e.IssueCreated)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_created");
@@ -113,26 +112,35 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.IssueSummary).HasColumnName("issue_summary");
             entity.Property(e => e.OpenCoding).HasColumnName("open_coding");
             entity.Property(e => e.Similarity).HasColumnName("similarity");
-        });
 
-        modelBuilder.Entity<AnalysisArchIssuesAllEmailsAxialCoding>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("analysis_arch_issues_all_emails_axial_coding");
-
-            entity.Property(e => e.AxialCode).HasColumnName("axial_code");
-            entity.Property(e => e.IssueEmailId).HasColumnName("issue_email_id");
+            entity.HasMany(d => d.AxialCodes).WithMany(p => p.IssueEmails)
+                .UsingEntity<Dictionary<string, object>>(
+                    "AnalysisArchIssuesAllEmailsAxialCoding",
+                    r => r.HasOne<AnalysisAxialCode>().WithMany()
+                        .HasForeignKey("AxialCode")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("analysis_arch_issues_all_emails_axial_coding_axial_code_fkey"),
+                    l => l.HasOne<AnalysisArchIssuesAllEmail>().WithMany()
+                        .HasForeignKey("IssueEmailId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("analysis_arch_issues_all_emails_axial_codin_issue_email_id_fkey"),
+                    j =>
+                    {
+                        j.HasKey("IssueEmailId", "AxialCode").HasName("analysis_arch_issues_all_emails_axial_coding_pkey");
+                        j.ToTable("analysis_arch_issues_all_emails_axial_coding");
+                        j.IndexerProperty<int>("IssueEmailId").HasColumnName("issue_email_id");
+                        j.IndexerProperty<string>("AxialCode").HasColumnName("axial_code");
+                    });
         });
 
         modelBuilder.Entity<AnalysisAxialCode>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("analysis_axial_codes");
+            entity.HasKey(e => e.Name).HasName("analysis_axial_codes_pk");
 
-            entity.Property(e => e.MeaningfulRelation).HasColumnName("meaningful_relation");
+            entity.ToTable("analysis_axial_codes");
+
             entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.MeaningfulRelation).HasColumnName("meaningful_relation");
         });
 
         modelBuilder.Entity<DataEmailEmail>(entity =>
@@ -236,10 +244,13 @@ public partial class PostgresContext : DbContext
 
         modelBuilder.Entity<ModifiedArchEmailsAllIssue>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("modified_arch_emails_all_issues");
+            entity.HasKey(e => e.ModifyPairId).HasName("modify_pair_id");
 
+            entity.ToTable("modified_arch_emails_all_issues");
+
+            entity.Property(e => e.ModifyPairId)
+                .HasDefaultValueSql("nextval('modify_arch_emails_all_issue_id_seq'::regclass)")
+                .HasColumnName("modify_pair_id");
             entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
             entity.Property(e => e.EmailBody).HasColumnName("email_body");
             entity.Property(e => e.EmailDate)
@@ -263,10 +274,13 @@ public partial class PostgresContext : DbContext
 
         modelBuilder.Entity<ModifiedArchIssuesAllEmail>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("modified_arch_issues_all_emails");
+            entity.HasKey(e => e.PairId).HasName("pair_id");
 
+            entity.ToTable("modified_arch_issues_all_emails");
+
+            entity.Property(e => e.PairId)
+                .HasDefaultValueSql("nextval('modify_arch_issues_all_email_id_seq'::regclass)")
+                .HasColumnName("pair_id");
             entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
             entity.Property(e => e.EmailBody).HasColumnName("email_body");
             entity.Property(e => e.EmailDate)
@@ -329,6 +343,8 @@ public partial class PostgresContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("RESULT_arch_issues_all_emails_issue_key_fkey");
         });
+        modelBuilder.HasSequence<int>("modify_arch_emails_all_issue_id_seq");
+        modelBuilder.HasSequence<int>("modify_arch_issues_all_email_id_seq");
 
         OnModelCreatingPartial(modelBuilder);
     }

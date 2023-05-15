@@ -5,6 +5,8 @@ namespace databaseEditor.Models;
 
 public partial class ModifiedArchEmailsAllIssue
 {
+    public int ModifyPairId { get; set; }
+
     public int EmailId { get; set; }
 
     public string IssueKey { get; set; } = null!;
@@ -29,5 +31,5 @@ public partial class ModifiedArchEmailsAllIssue
 
     public long? IssueDescriptionWordCount { get; set; }
 
-    public long? CreationTimeDifference { get; set; }
+    public int? CreationTimeDifference { get; set; }
 }
