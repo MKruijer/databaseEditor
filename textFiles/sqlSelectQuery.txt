@@ -1,0 +1,2 @@
+SELECT * from (SELECT *,row_number() over (partition by email_thread_id order by pair_id) as row_number FROM modified_arch_issues_all_emails)
+as rows where row_number = 1;
