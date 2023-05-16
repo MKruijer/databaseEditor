@@ -5,7 +5,7 @@ namespace databaseEditor.Models;
 
 public partial class ModifiedArchIssuesAllEmail
 {
-    public int PairId { get; set; }
+    public int Id { get; set; }
 
     public int EmailId { get; set; }
 
@@ -13,13 +13,7 @@ public partial class ModifiedArchIssuesAllEmail
 
     public decimal? Similarity { get; set; }
 
-    public string? EmailBody { get; set; }
-
     public DateTime? EmailDate { get; set; }
-
-    public string? IssueSummary { get; set; }
-
-    public string? IssueDescription { get; set; }
 
     public DateTime? IssueCreated { get; set; }
 

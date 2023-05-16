@@ -16,18 +16,13 @@ internal class Program
                 SourceTableLogic.FillInSourceTables(listOfEmails, listOfJiraIssues);
                 DatabaseFunctions.SaveDatabase(db);
             }
-            if (UIFunctions.CheckIfUserWantsToTakeAction("insert source table data into modify tables"))
-            {
-                ModifiedTableLogic.InsertDataFromOldTableToNewTable();
-                DatabaseFunctions.SaveDatabase(db);
-            }
             if (UIFunctions.CheckIfUserWantsToTakeAction("edit modify table"))
             {
                 var listOfEmails = DatabaseFunctions.GetEmails(db);
                 var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
-                var listOfModifiedArchEmailsAllIssuePairs = DatabaseFunctions.GetModifiedArchEmailsAllIssues(db);
-                var listOfModifiedArchIssuesAllEmailPairs = DatabaseFunctions.GetModifiedArchIssuesAllEmails(db);
-                ModifiedTableLogic.FillInModifyTables(listOfEmails, listOfJiraIssues, listOfModifiedArchEmailsAllIssuePairs, listOfModifiedArchIssuesAllEmailPairs);
+                var listOfModifiedResultsArchEmailsAllIssuePairs = DatabaseFunctions.GetModifiedArchEmailsAllIssues(db);
+                var listOfModifiedResultsArchIssuesAllEmailPairs = DatabaseFunctions.GetModifiedArchIssuesAllEmails(db);
+                ModifiedTableLogic.FillInModifyTables(listOfEmails, listOfJiraIssues, listOfModifiedResultsArchEmailsAllIssuePairs, listOfModifiedResultsArchIssuesAllEmailPairs);
                 DatabaseFunctions.SaveDatabase(db);
             }
         }

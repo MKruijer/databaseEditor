@@ -25,6 +25,7 @@ namespace databaseEditor.Database
             Console.Write("\rDB changes succesfully saved.\n");
         }
 
+        #region GetTables
         public static List<DataEmailEmail> GetEmails(RelationsDbContext dbContext)
         {
             Console.Write("Loading email data...");
@@ -43,22 +44,23 @@ namespace databaseEditor.Database
 
         public static List<ModifiedArchEmailsAllIssue> GetModifiedArchEmailsAllIssues(RelationsDbContext dbContext)
         {
-            Console.Write("Loading modified ArchEmailsAllIssues table...");
+            Console.Write("Loading modified results ArchEmailsAllIssues table...");
             var listOfModifiedArchEmailsAllIssues = dbContext.ModifiedArchEmailsAllIssues.ToList();
-            Console.Write("\rLoaded modified ArchEmailsAllIssues data.      \n");
+            Console.Write("\rLoaded modified results ArchEmailsAllIssues data.      \n");
             return listOfModifiedArchEmailsAllIssues;
 
         }
 
         public static List<ModifiedArchIssuesAllEmail> GetModifiedArchIssuesAllEmails(RelationsDbContext dbContext)
         {
-            Console.Write("Loading modified ArchEmailsAllIssues table...");
+            Console.Write("Loading modified results ArchEmailsAllIssues table...");
             var listOfModifiedArchIssuesAllEmails = dbContext.ModifiedArchIssuesAllEmails.ToList();
-            Console.Write("\rLoaded modified ArchEmailsAllIssues data.      \n");
+            Console.Write("\rLoaded modified results ArchEmailsAllIssues data.      \n");
             return listOfModifiedArchIssuesAllEmails;
 
         }
 
+        #endregion GetTables
         public static async Task ExecuteSQL(string sql)
         {
             var con = new NpgsqlConnection(

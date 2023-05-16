@@ -16,25 +16,19 @@ namespace databaseEditor.Logic
                                                             "email_id",
                                                             "issue_key",
                                                             "similarity",
-                                                            "email_body",
-                                                            "email_date",
-                                                            "issue_summary",
-                                                            "issue_description",
-                                                            "issue_created",
-                                                            "issue_modified"
                                                         };
-            InsertDataFromOldTableIntoNewTable("analysis_arch_emails_all_issues", "modified_arch_emails_all_issues", columnNames);
-            InsertDataFromOldTableIntoNewTable("analysis_arch_issues_all_emails", "modified_arch_issues_all_emails", columnNames);
+            InsertDataFromOldTableIntoNewTable("result_arch_emails_all_issues", "modified_results_arch_emails_all_issues", columnNames);
+            InsertDataFromOldTableIntoNewTable("result_arch_issues_all_emails", "modified_results_arch_issues_all_emails", columnNames);
         }
 
         public static void FillInModifyTables(List<DataEmailEmail> listOfEmails, List<DataJiraJiraIssue> listOfJiraIssues, List<ModifiedArchEmailsAllIssue> listOfModifiedArchEmailsAllIssuePairs, List<ModifiedArchIssuesAllEmail> listOfModifiedArchIssuesAllEmailPairs)
         {
             FillInModifiedArchEmailsAllIssueNewEmailData(listOfModifiedArchEmailsAllIssuePairs, listOfEmails);
-            FillInModifiedArchEmailsAllIssueIssueDescription(listOfModifiedArchEmailsAllIssuePairs, listOfJiraIssues);
+            FillInModifiedArchEmailsAllIssueNewIssueData(listOfModifiedArchEmailsAllIssuePairs, listOfJiraIssues);
             FillInModifiedArchEmailsAllIssueCreationTimeDifference(listOfModifiedArchEmailsAllIssuePairs);
 
             FillInModifiedArchIssuesAllEmailNewEmailData(listOfModifiedArchIssuesAllEmailPairs, listOfEmails);
-            FillInModifiedArchIssuesAllEmailIssueDescription(listOfModifiedArchIssuesAllEmailPairs,listOfJiraIssues);
+            FillInModifiedArchIssuesAllEmailIssueDescription(listOfModifiedArchIssuesAllEmailPairs, listOfJiraIssues);
             FillInModifiedArchIssuesAllEmailCreationTimeDifference(listOfModifiedArchIssuesAllEmailPairs);
         }
 
@@ -73,28 +67,33 @@ namespace databaseEditor.Logic
         {
             var totalAmountOfPairs = listOfModifiedCosinePairs.Count();
             int currentAmountOfPairsDone = 0;
-            Console.WriteLine("Starting filling in email thread and word count...");
+            Console.WriteLine("Starting filling in email data...");
             foreach (var pair in listOfModifiedCosinePairs)
             {
-                pair.EmailWordCount = listOfEmails.Where(e => e.Id == pair.EmailId).FirstOrDefault()?.WordCount;
-                pair.EmailThreadId = listOfEmails.Where(e => e.Id == pair.EmailId).FirstOrDefault()?.ThreadId;
+                var email = listOfEmails.Where(e => e.Id == pair.EmailId).FirstOrDefault();
+                pair.EmailWordCount = email?.WordCount;
+                pair.EmailThreadId = email?.ThreadId;
+                pair.EmailDate = email?.Date;
                 UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
             }
-            Console.Write("\rFilling in email thread and word count completed.\n");
+            Console.Write("\rFilling in email data completed.\n");
             Console.WriteLine();
         }
 
-        private static void FillInModifiedArchEmailsAllIssueIssueDescription(List<ModifiedArchEmailsAllIssue> listOfModifiedCosinePairs, List<DataJiraJiraIssue> listOfJiraIssues)
+        private static void FillInModifiedArchEmailsAllIssueNewIssueData(List<ModifiedArchEmailsAllIssue> listOfModifiedCosinePairs, List<DataJiraJiraIssue> listOfJiraIssues)
         {
             var totalAmountOfPairs = listOfModifiedCosinePairs.Count();
             int currentAmountOfPairsDone = 0;
-            Console.WriteLine("Starting filling in issue description word count...");
+            Console.WriteLine("Starting filling in issue data...");
             foreach (var pair in listOfModifiedCosinePairs)
             {
-                //pair.IssueDescriptionWordCount = listOfJiraIssues.Where(i => i.Key == pair.IssueKey).FirstOrDefault()?.DescriptionWordCount;
+                var issue = listOfJiraIssues.Where(i => i.Key == pair.IssueKey).FirstOrDefault();
+                pair.IssueDescriptionWordCount = issue?.DescriptionWordCount;
+                pair.IssueCreated = issue?.Created;
+                pair.IssueModified = issue?.Modified;
                 UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
             }
-            Console.Write("\rFilling in issue description word count completed.\n");
+            Console.Write("\rFilling in issue data completed.\n");
             Console.WriteLine();
         }
 
@@ -126,14 +125,16 @@ namespace databaseEditor.Logic
         {
             var totalAmountOfPairs = listOfModifiedCosinePairs.Count();
             int currentAmountOfPairsDone = 0;
-            Console.WriteLine("Starting filling in email thread and word count...");
+            Console.WriteLine("Starting filling in email data...");
             foreach (var pair in listOfModifiedCosinePairs)
             {
-                pair.EmailWordCount = listOfEmails.Where(e => e.Id == pair.EmailId).FirstOrDefault()?.WordCount;
-                pair.EmailThreadId = listOfEmails.Where(e => e.Id == pair.EmailId).FirstOrDefault()?.ThreadId;
+                var email = listOfEmails.Where(e => e.Id == pair.EmailId).FirstOrDefault();
+                pair.EmailWordCount = email?.WordCount;
+                pair.EmailThreadId = email?.ThreadId;
+                pair.EmailDate = email?.Date;
                 UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
             }
-            Console.Write("\rFilling in email thread and word count completed.\n");
+            Console.Write("\rFilling in email data completed.\n");
             Console.WriteLine();
         }
 
@@ -141,13 +142,16 @@ namespace databaseEditor.Logic
         {
             var totalAmountOfPairs = listOfModifiedCosinePairs.Count();
             int currentAmountOfPairsDone = 0;
-            Console.WriteLine("Starting filling in issue description word count...");
+            Console.WriteLine("Starting filling in issue data...");
             foreach (var pair in listOfModifiedCosinePairs)
             {
-                pair.IssueDescriptionWordCount = listOfJiraIssues.Where(i => i.Key == pair.IssueKey).FirstOrDefault()?.DescriptionWordCount;
+                var issue = listOfJiraIssues.Where(i => i.Key == pair.IssueKey).FirstOrDefault();
+                pair.IssueDescriptionWordCount = issue?.DescriptionWordCount;
+                pair.IssueCreated = issue?.Created;
+                pair.IssueModified = issue?.Modified; 
                 UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
             }
-            Console.Write("\rFilling in issue description word count completed.\n");
+            Console.Write("\rFilling in issue data completed.\n");
             Console.WriteLine();
         }
 

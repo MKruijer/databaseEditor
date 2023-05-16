@@ -1,26 +1,22 @@
 Creation of sequence:
 
-create sequence modify_arch_issues_all_email_id_seq
+CREATE SEQUENCE IF NOT EXISTS modify_arch_issues_all_email_id_seq
     as integer;
 
-create sequence modify_arch_emails_all_issue_id_seq
+CREATE SEQUENCE IF NOT EXISTS modify_arch_emails_all_issue_id_seq
     as integer;
 
 
 Creation of new table:
 
-create table modified_arch_issues_all_emails
+create table modified_results_arch_issues_all_emails
 (
-id integer default nextval('modify_arch_emails_all_issue_id_sq'::regclass) not null
-constraint pair_id
+id integer default nextval('modify_arch_emails_all_issue_id_seq'::regclass) not null
 primary key,
     email_id integer not null,
     issue_key text not null,
     similarity numeric,
-    email_body text,
     email_date timestamp,
-    issue_summary text,
-    issue_description text,
     issue_created timestamp,
     issue_modified timestamp,
     email_thread_id integer,
@@ -29,18 +25,14 @@ primary key,
     creation_time_difference integer
 );
 
-create table modified_arch_emails_all_issues
+create table modified_results_arch_emails_all_issues
 (
 id integer default nextval('modify_arch_emails_all_issue_id_seq'::regclass) not null
-constraint pair_id
 primary key,
     email_id integer not null,
     issue_key text not null,
     similarity numeric,
-    email_body text,
     email_date timestamp,
-    issue_summary text,
-    issue_description text,
     issue_created timestamp,
     issue_modified timestamp,
     email_thread_id integer,
@@ -48,6 +40,9 @@ primary key,
     issue_description_word_count bigint,
     creation_time_difference integer
 );
+
+INSERT INTO modified_results_arch_emails_all_issues (email_id, issue_key, similarity)
+SELECT email_id, issue_key, similarity FROM result_arch_emails_all_issues
 
 Altering tables:
 

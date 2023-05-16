@@ -244,15 +244,12 @@ public partial class RelationsDbContext : DbContext
 
         modelBuilder.Entity<ModifiedArchEmailsAllIssue>(entity =>
         {
-            entity.HasKey(e => e.ModifyPairId).HasName("modify_pair_id");
+            entity.HasKey(e => e.Id).HasName("modified_arch_emails_all_issues_pkey");
 
             entity.ToTable("modified_arch_emails_all_issues");
 
-            entity.Property(e => e.ModifyPairId)
-                .HasDefaultValueSql("nextval('modify_arch_emails_all_issue_id_seq'::regclass)")
-                .HasColumnName("modify_pair_id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailBody).HasColumnName("email_body");
             entity.Property(e => e.EmailDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("email_date");
@@ -262,27 +259,22 @@ public partial class RelationsDbContext : DbContext
             entity.Property(e => e.IssueCreated)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescription).HasColumnName("issue_description");
             entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
             entity.Property(e => e.IssueKey).HasColumnName("issue_key");
             entity.Property(e => e.IssueModified)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_modified");
-            entity.Property(e => e.IssueSummary).HasColumnName("issue_summary");
             entity.Property(e => e.Similarity).HasColumnName("similarity");
         });
 
         modelBuilder.Entity<ModifiedArchIssuesAllEmail>(entity =>
         {
-            entity.HasKey(e => e.PairId).HasName("pair_id");
+            entity.HasKey(e => e.Id).HasName("modified_arch_issues_all_emails_pkey");
 
             entity.ToTable("modified_arch_issues_all_emails");
 
-            entity.Property(e => e.PairId)
-                .HasDefaultValueSql("nextval('modify_arch_issues_all_email_id_seq'::regclass)")
-                .HasColumnName("pair_id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailBody).HasColumnName("email_body");
             entity.Property(e => e.EmailDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("email_date");
@@ -292,13 +284,11 @@ public partial class RelationsDbContext : DbContext
             entity.Property(e => e.IssueCreated)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescription).HasColumnName("issue_description");
             entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
             entity.Property(e => e.IssueKey).HasColumnName("issue_key");
             entity.Property(e => e.IssueModified)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_modified");
-            entity.Property(e => e.IssueSummary).HasColumnName("issue_summary");
             entity.Property(e => e.Similarity).HasColumnName("similarity");
         });
 
@@ -343,8 +333,8 @@ public partial class RelationsDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("RESULT_arch_issues_all_emails_issue_key_fkey");
         });
-        modelBuilder.HasSequence<int>("modify_arch_emails_all_issue_id_seq");
-        modelBuilder.HasSequence<int>("modify_arch_issues_all_email_id_seq");
+        modelBuilder.HasSequence<int>("modified_arch_emails_all_issues_id_seq");
+        modelBuilder.HasSequence<int>("modified_arch_issues_all_emails_id_seq");
 
         OnModelCreatingPartial(modelBuilder);
     }
