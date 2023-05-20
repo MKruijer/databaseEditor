@@ -1,12 +1,17 @@
 ﻿using databaseEditor.Database;
+using databaseEditor.jira;
 using databaseEditor.Logic;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace databaseEditor;
 internal class Program
 {
     static void Main(string[] args)
     {
+        //var jsonString = JiraApiObject.RestCall("CASSANDRA-13475", "fields=parent");
+        Console.WriteLine(JiraApiObject.GetTopParentJiraIssueKeyFromJiraIssueKey("CASSANDRA-13475"));
+
         using (var db = DatabaseFunctions.GetPostgresContext())
         {
             if (UIFunctions.CheckIfUserWantsToTakeAction("edit source tables"))
