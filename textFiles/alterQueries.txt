@@ -1,0 +1,41 @@
+alter table data_email_email
+	add thread_id integer;
+
+alter table data_email_email
+	add word_count bigint;
+
+alter table data_email_email
+    alter column parent_id type integer using parent_id::integer;
+
+alter table data_email_email
+    alter column id type integer using id::integer;
+
+alter table data_email_email_tag
+    alter column email_id type integer using email_id::integer;
+
+alter table data_email_email_tag
+    alter column tag_id type integer using tag_id::integer;
+
+alter table data_jira_jira_issue
+	add description_word_count bigint;
+
+alter table data_jira_jira_issue
+	add parent_key text;
+
+
+
+alter table analysis_arch_emails_all_issues_axial_coding
+    alter column email_issue_id type int using email_issue_id::int;
+
+alter table analysis_arch_issues_all_emails_axial_coding
+    alter column issue_email_id type integer using issue_email_id::integer;
+
+alter table result_arch_emails_all_issues
+    alter column email_id type integer using email_id::integer;
+
+alter table result_arch_issues_all_emails
+    alter column email_id type integer using email_id::integer;
+
+
+
+

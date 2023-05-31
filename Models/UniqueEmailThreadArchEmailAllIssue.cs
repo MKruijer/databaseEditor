@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace databaseEditor.Models;
 
-public partial class ModifiedArchEmailsAllIssue
+public partial class UniqueEmailThreadArchEmailAllIssue
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
 
-    public int EmailId { get; set; }
+    public int? EmailId { get; set; }
 
-    public string IssueKey { get; set; } = null!;
+    public string? IssueKey { get; set; }
 
     public decimal? Similarity { get; set; }
 

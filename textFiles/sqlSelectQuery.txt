@@ -1,2 +1,27 @@
-SELECT * from (SELECT *,row_number() over (partition by email_thread_id order by pair_id) as row_number FROM modified_arch_issues_all_emails)
-as rows where row_number = 1;
+CREATE TABLE analysis_unique_pairs_arch_issues_all_emails AS
+SELECT t.id, t.email_id, t.issue_key, t.similarity, t.email_word_count, t.issue_description_word_count, LEAST(email_word_count, issue_description_word_count) as smallest_word_countas, t.creation_time_difference, t.email_thread_id, t.issue_parent_key
+FROM (
+  SELECT email_thread_id, issue_parent_key, MAX(similarity) AS max_similarity
+  FROM modified_arch_issues_all_emails
+  GROUP BY email_thread_id, issue_parent_key
+) AS subq
+JOIN modified_arch_issues_all_emails AS t
+  ON t.email_thread_id = subq.email_thread_id
+  AND t.issue_parent_key = subq.issue_parent_key
+  AND t.similarity = subq.max_similarity
+WHERE LEAST(email_word_count, issue_description_word_count) >= 50
+ORDER BY t.similarity DESC;
+
+CREATE TABLE analysis_unique_pairs_arch_emails_all_issues AS
+SELECT t.id, t.email_id, t.issue_key, t.similarity, t.email_word_count, t.issue_description_word_count, LEAST(email_word_count, issue_description_word_count) as smallest_word_countas, t.creation_time_difference, t.email_thread_id, t.issue_parent_key
+FROM (
+  SELECT email_thread_id, issue_parent_key, MAX(similarity) AS max_similarity
+  FROM modified_arch_emails_all_issues
+  GROUP BY email_thread_id, issue_parent_key
+) AS subq
+JOIN modified_arch_emails_all_issues AS t
+  ON t.email_thread_id = subq.email_thread_id
+  AND t.issue_parent_key = subq.issue_parent_key
+  AND t.similarity = subq.max_similarity
+WHERE LEAST(email_word_count, issue_description_word_count) >= 50
+ORDER BY t.similarity DESC;

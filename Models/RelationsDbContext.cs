@@ -37,6 +37,10 @@ public partial class RelationsDbContext : DbContext
 
     public virtual DbSet<ResultArchIssuesAllEmail> ResultArchIssuesAllEmails { get; set; }
 
+    public virtual DbSet<UniqueEmailThreadArchEmailAllIssue> UniqueEmailThreadArchEmailAllIssues { get; set; }
+
+    public virtual DbSet<UniqueEmailThreadArchIssueAllEmail> UniqueEmailThreadArchIssueAllEmails { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseNpgsql("Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
@@ -221,6 +225,7 @@ public partial class RelationsDbContext : DbContext
             entity.Property(e => e.Modified)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("modified");
+            entity.Property(e => e.ParentKey).HasColumnName("parent_key");
             entity.Property(e => e.Summary).HasColumnName("summary");
         });
 
@@ -264,6 +269,7 @@ public partial class RelationsDbContext : DbContext
             entity.Property(e => e.IssueModified)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_modified");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
             entity.Property(e => e.Similarity).HasColumnName("similarity");
         });
 
@@ -289,6 +295,7 @@ public partial class RelationsDbContext : DbContext
             entity.Property(e => e.IssueModified)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_modified");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
             entity.Property(e => e.Similarity).HasColumnName("similarity");
         });
 
@@ -332,6 +339,58 @@ public partial class RelationsDbContext : DbContext
                 .HasForeignKey(d => d.IssueKey)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("RESULT_arch_issues_all_emails_issue_key_fkey");
+        });
+
+        modelBuilder.Entity<UniqueEmailThreadArchEmailAllIssue>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("unique_email_thread_arch_email_all_issue");
+
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("email_date");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IssueCreated)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_created");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueModified)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_modified");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+        });
+
+        modelBuilder.Entity<UniqueEmailThreadArchIssueAllEmail>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("unique_email_thread_arch_issue_all_email");
+
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("email_date");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IssueCreated)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_created");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueModified)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_modified");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
         });
         modelBuilder.HasSequence<int>("modified_arch_emails_all_issues_id_seq");
         modelBuilder.HasSequence<int>("modified_arch_issues_all_emails_id_seq");

@@ -28,6 +28,8 @@ public partial class DataJiraJiraIssue
 
     public long? DescriptionWordCount { get; set; }
 
+    public string? ParentKey { get; set; }
+
     public virtual ICollection<DataJiraJiraIssueComment> DataJiraJiraIssueComments { get; set; } = new List<DataJiraJiraIssueComment>();
 
     public virtual ICollection<ResultArchEmailsAllIssue> ResultArchEmailsAllIssues { get; set; } = new List<ResultArchEmailsAllIssue>();

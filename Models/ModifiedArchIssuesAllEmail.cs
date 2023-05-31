@@ -26,4 +26,6 @@ public partial class ModifiedArchIssuesAllEmail
     public long? IssueDescriptionWordCount { get; set; }
 
     public int? CreationTimeDifference { get; set; }
+
+    public string? IssueParentKey { get; set; }
 }

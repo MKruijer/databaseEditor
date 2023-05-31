@@ -9,12 +9,35 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        //var jsonString = JiraApiObject.RestCall("CASSANDRA-13475", "fields=parent");
-        Console.WriteLine(JiraApiObject.GetTopParentJiraIssueKeyFromJiraIssueKey("CASSANDRA-13475"));
+        //string url = "https://issues.apache.org/jira/browse/HADOOP-249";
+
+        //using (HttpClient client = new HttpClient())
+        //{
+        //    HttpResponseMessage response = client.GetAsync(url).Result;
+
+        //    if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        //    {
+        //        Console.WriteLine("API rate limit exceeded!");
+        //    }
+        //    if (response.Headers.Contains("RetryAfter") || response.Headers.Contains("Warning"))
+        //    {
+        //        string retryAfter = response.Headers.GetValues("RetryAfter").FirstOrDefault();
+        //        string warning = response.Headers.GetValues("Warning").FirstOrDefault();
+
+        //        Console.WriteLine($"retryAfter: {retryAfter}, Warning: {warning}");
+        //    }
+        //}
+
+
 
         using (var db = DatabaseFunctions.GetPostgresContext())
         {
-            if (UIFunctions.CheckIfUserWantsToTakeAction("edit source tables"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("update changes"))
+            {
+                var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
+                SourceTableLogic.FillInJiraParentKeys(listOfJiraIssues);
+            }
+                if (UIFunctions.CheckIfUserWantsToTakeAction("edit source tables"))
             {
                 var listOfEmails = DatabaseFunctions.GetEmails(db);
                 var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
@@ -28,6 +51,14 @@ internal class Program
                 var listOfModifiedResultsArchEmailsAllIssuePairs = DatabaseFunctions.GetModifiedArchEmailsAllIssues(db);
                 var listOfModifiedResultsArchIssuesAllEmailPairs = DatabaseFunctions.GetModifiedArchIssuesAllEmails(db);
                 ModifiedTableLogic.FillInModifyTables(listOfEmails, listOfJiraIssues, listOfModifiedResultsArchEmailsAllIssuePairs, listOfModifiedResultsArchIssuesAllEmailPairs);
+                DatabaseFunctions.SaveDatabase(db);
+            }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("fill in jira parentKey"))
+            {
+                var listOfModifiedResultsArchEmailsAllIssuePairs = DatabaseFunctions.GetModifiedArchEmailsAllIssues(db).Where(pair => pair.IssueParentKey == null).OrderByDescending(pair => pair.Similarity).Take(1000).ToList(); ;
+                var listOfModifiedResultsArchIssuesAllEmailPairs = DatabaseFunctions.GetModifiedArchIssuesAllEmails(db).Where(pair => pair.IssueParentKey == null).OrderByDescending(pair => pair.Similarity).Take(1000).ToList(); ;
+                ModifiedTableLogic.FillInArchEmailsAllIssueJiraParent(listOfModifiedResultsArchEmailsAllIssuePairs);
+                ModifiedTableLogic.FillInArchIssuesAllEmailJiraParent(listOfModifiedResultsArchIssuesAllEmailPairs);
                 DatabaseFunctions.SaveDatabase(db);
             }
         }

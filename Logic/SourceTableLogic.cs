@@ -1,4 +1,5 @@
-﻿using databaseEditor.Models;
+﻿using databaseEditor.jira;
+using databaseEditor.Models;
 namespace databaseEditor.Logic
 {
     /// <summary>
@@ -9,8 +10,8 @@ namespace databaseEditor.Logic
         public static void FillInSourceTables(List<DataEmailEmail> listOfEmails, List<DataJiraJiraIssue> listOfJiraIssues)
         {
             FillEmailThreadIds(listOfEmails);
-            FillInWordCount(listOfEmails);
-            FillInWordCount(listOfJiraIssues);
+            FillInEmailWordCount(listOfEmails);
+            FillInJiraWordCount(listOfJiraIssues);
         }
 
         private static void FillEmailThreadIds(List<DataEmailEmail> listOfEmails)
@@ -20,31 +21,39 @@ namespace databaseEditor.Logic
             Console.WriteLine("Starting filling in thread id...");
             foreach (var email in listOfEmails)
             {
-                if (email.ParentId == null)
+                try
                 {
-                    email.ThreadId = (int)email.Id;
-                }
-                else
+                    email.ThreadId = GetTopParentIdRecursively(listOfEmails, email);
+                } catch (Exception ex)
                 {
-                    if (email.InReplyTo == null)
-                    {
-                        throw new Exception("Email has parent but no reply to. Invalid dataset.");
-                    }
-                    var parentEmail = listOfEmails
-                        .Where(e => e.MessageId == email.InReplyTo)
-                        .FirstOrDefault();
-                    if (parentEmail == null)
-                    {
-                        throw new Exception("Email has parent but can't find parent. Probably an invalid dataset.");
-                    }
-                    email.ThreadId = parentEmail.Id;
+                    Console.WriteLine(ex.Message);
+                    email.ThreadId = null;
                 }
                 UIFunctions.PrintStatusUpdate(++currentAmountOfEmailsDone, totalAmountOfEmails);
             }
             Console.Write("\rFilling in thread id completed.\n");
         }
 
-        private static void FillInWordCount(List<DataEmailEmail> listOfEmails)
+        private static int GetTopParentIdRecursively(List<DataEmailEmail> listOfEmails, DataEmailEmail email)
+        {
+            if (email.ParentId == null)
+            {
+                return email.Id;
+            }
+            else
+            {
+                var parentEmail = listOfEmails
+                        .Where(e => e.Id == email.ParentId)
+                        .FirstOrDefault();
+                if (parentEmail == null)
+                {
+                    throw new Exception($"Email with id {email.Id} has parent but can't find parent. Probably an invalid dataset.");
+                }
+                return GetTopParentIdRecursively(listOfEmails, parentEmail);
+            }
+        }
+
+        private static void FillInEmailWordCount(List<DataEmailEmail> listOfEmails)
         {
             var totalAmountOfEmails = listOfEmails.Count();
             int currentAmountOfEmailsDone = 0;
@@ -63,7 +72,7 @@ namespace databaseEditor.Logic
             Console.WriteLine("\nFilling in word count completed.");
         }
 
-        private static void FillInWordCount(List<DataJiraJiraIssue> listOfJiraJiraIssues)
+        private static void FillInJiraWordCount(List<DataJiraJiraIssue> listOfJiraJiraIssues)
         {
             var totalAmountOfJiraJiraIssues = listOfJiraJiraIssues.Count();
             int currentAmountOfJiraJiraIssuesDone = 0;
@@ -80,6 +89,19 @@ namespace databaseEditor.Logic
                 UIFunctions.PrintStatusUpdate(++currentAmountOfJiraJiraIssuesDone, totalAmountOfJiraJiraIssues);
             }
             Console.Write("\rFilling in word count completed.\n");
+        }
+
+        public static void FillInJiraParentKeys(List<DataJiraJiraIssue> listOfJiraJiraIssues)
+        {
+            var totalAmountOfJiraJiraIssues = listOfJiraJiraIssues.Count();
+            int currentAmountOfJiraJiraIssuesDone = 0;
+            Console.WriteLine("Starting filling in parent keys...");
+            foreach (var JiraJiraIssue in listOfJiraJiraIssues)
+            {
+                JiraJiraIssue.ParentKey = JiraApiObject.GetTopParentJiraIssueKeyFromJiraIssueKey(JiraJiraIssue.Key);
+                UIFunctions.PrintStatusUpdate(++currentAmountOfJiraJiraIssuesDone, totalAmountOfJiraJiraIssues);
+            }
+            Console.Write("\rFilling in parent keys completed.\n");
         }
     }
 }

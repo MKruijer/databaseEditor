@@ -1,4 +1,5 @@
 ﻿using databaseEditor.Database;
+using databaseEditor.jira;
 using databaseEditor.Models;
 using System;
 using System.Collections.Generic;
@@ -91,6 +92,7 @@ namespace databaseEditor.Logic
                 pair.IssueDescriptionWordCount = issue?.DescriptionWordCount;
                 pair.IssueCreated = issue?.Created;
                 pair.IssueModified = issue?.Modified;
+                pair.IssueParentKey = issue?.ParentKey;
                 UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
             }
             Console.Write("\rFilling in issue data completed.\n");
@@ -148,7 +150,8 @@ namespace databaseEditor.Logic
                 var issue = listOfJiraIssues.Where(i => i.Key == pair.IssueKey).FirstOrDefault();
                 pair.IssueDescriptionWordCount = issue?.DescriptionWordCount;
                 pair.IssueCreated = issue?.Created;
-                pair.IssueModified = issue?.Modified; 
+                pair.IssueModified = issue?.Modified;
+                pair.IssueParentKey = issue?.ParentKey;
                 UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
             }
             Console.Write("\rFilling in issue data completed.\n");
@@ -177,6 +180,28 @@ namespace databaseEditor.Logic
             }
             Console.Write("\rFilling in creation time difference completed.\n");
             Console.WriteLine();
+        }
+
+        public static void FillInArchIssuesAllEmailJiraParent(List<Models.ModifiedArchIssuesAllEmail> listOfModifiedResultsArchIssuesAllEmailPairs)
+        {
+            List<string> jiraKeyList = new List<string>();
+            listOfModifiedResultsArchIssuesAllEmailPairs.ForEach(pair => jiraKeyList.Add(pair.IssueKey));
+            var dictionary = JiraApiFunctions.GetParentDictionaryFromJiraIssues(jiraKeyList);
+            listOfModifiedResultsArchIssuesAllEmailPairs.ForEach(pair =>
+            {
+                pair.IssueParentKey = dictionary[pair.IssueKey].ParentIssueKey ?? pair.IssueKey;
+            });
+        }
+
+        public static void FillInArchEmailsAllIssueJiraParent(List<Models.ModifiedArchEmailsAllIssue> listOfModifiedResultsArchEmailsAllIssuePairs)
+        {
+            List<string> jiraKeyList = new List<string>();
+            listOfModifiedResultsArchEmailsAllIssuePairs.ForEach(pair => jiraKeyList.Add(pair.IssueKey));
+            var dictionary = JiraApiFunctions.GetParentDictionaryFromJiraIssues(jiraKeyList);
+            listOfModifiedResultsArchEmailsAllIssuePairs.ForEach(pair =>
+            {
+                pair.IssueParentKey = dictionary[pair.IssueKey].ParentIssueKey ?? pair.IssueKey;
+            });
         }
 
     }
