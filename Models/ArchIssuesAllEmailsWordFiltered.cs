@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace databaseEditor.Models;
 
-public partial class ExpandedArchIssuesAllEmail
+public partial class ArchIssuesAllEmailsWordFiltered
 {
     public int Id { get; set; }
 

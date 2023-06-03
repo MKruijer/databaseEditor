@@ -23,6 +23,8 @@ public partial class ExpandedArchEmailsAllIssue
 
     public int? IssueDescriptionWordCount { get; set; }
 
+    public int? SmallestWordCount { get; set; }
+
     public int? EmailThreadId { get; set; }
 
     public string? IssueParentKey { get; set; }

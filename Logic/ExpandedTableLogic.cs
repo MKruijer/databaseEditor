@@ -1,4 +1,5 @@
-﻿using databaseEditor.Models;
+﻿using databaseEditor.Database;
+using databaseEditor.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,8 @@ namespace databaseEditor.Logic
 
             FillInCreationTimeDifferenceInArchEmailsAllIssues(listOfExpandedArchEmailsAllIssuesPairs);
             FillInCreationTimeDifferenceInArchIssuesAllEmails(listOfExpandedArchIssuesAllEmailsPairs);
+
+            DatabaseFunctions.SetSmallestWordCount();
         }
 
         private static void FillInNewIssueDataInArchEmailsAllIssues(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
@@ -149,23 +152,23 @@ namespace databaseEditor.Logic
         public static void FillInJiraIssueParentKeyInArchEmailsAllIssues(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
                                                                           List<DataJiraJiraIssue> listOfJiraIssues)
         {
-            var totalAmountOfPairs = listOfExpandedArchEmailsAllIssuesPairs.Count();
+            var totalAmountOfPairs = listOfJiraIssues.Where(issue => issue.ParentKey != null).Count();
             int currentAmountOfPairsDone = 0;
             Console.WriteLine("Starting filling in issue parent keys in ArchEmailsAllIssues...");
             listOfJiraIssues
                 .Where(issue => issue.ParentKey != null)
                 .ToList()
                 .ForEach(issue =>
-            {
-                listOfExpandedArchEmailsAllIssuesPairs
-                .Where(i => i.IssueKey == issue.Key)
-                .ToList()
-                .ForEach(pair =>
                 {
-                    pair.IssueParentKey = issue.ParentKey;
+                    listOfExpandedArchEmailsAllIssuesPairs
+                    .Where(pair => pair.IssueParentKey == null && pair.IssueKey == issue.Key)
+                    .ToList()
+                    .ForEach(pair =>
+                    {
+                        pair.IssueParentKey = issue.ParentKey;
+                    });
+                    UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
                 });
-                UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
-            });
             Console.Write("\rFilling in issue parent keys in ArchEmailsAllIssues completed.\n");
             Console.WriteLine();
         }
@@ -173,7 +176,7 @@ namespace databaseEditor.Logic
         public static void FillInJiraIssueParentKeyInArchIssuesAllEmail(List<ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs,
                                                                          List<DataJiraJiraIssue> listOfJiraIssues)
         {
-            var totalAmountOfPairs = listOfExpandedArchIssuesAllEmailsPairs.Count();
+            var totalAmountOfPairs = listOfJiraIssues.Where(issue => issue.ParentKey != null).Count();
             int currentAmountOfPairsDone = 0;
             Console.WriteLine("Starting filling in issue parent keys in ArchIssuesAllEmails...");
             listOfJiraIssues
@@ -182,7 +185,7 @@ namespace databaseEditor.Logic
                 .ForEach(issue =>
                 {
                     listOfExpandedArchIssuesAllEmailsPairs
-                    .Where(i => i.IssueKey == issue.Key)
+                    .Where(pair => pair.IssueParentKey == null && pair.IssueKey == issue.Key)
                     .ToList()
                     .ForEach(pair =>
                     {

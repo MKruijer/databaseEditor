@@ -25,6 +25,27 @@ namespace databaseEditor.Database
             Console.Write("\rDB changes succesfully saved.\n");
         }
 
+        private static async Task ExecuteSQL(string sql)
+        {
+            var con = new NpgsqlConnection(
+                        connectionString: "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
+            con.Open();
+            var command = new NpgsqlCommand()
+            {
+                Connection = con,
+                CommandText = sql
+            };
+            await command.ExecuteNonQueryAsync();
+        }
+
+        public static void SetSmallestWordCount()
+        {
+            Console.Write("Setting smallest_word_count in tables...");
+            ExecuteSQL("UPDATE expanded_arch_emails_all_issues SET smallest_word_count = LEAST(issue_description_word_count, email_word_count)").Wait();
+            ExecuteSQL("UPDATE expanded_arch_issues_all_emails SET smallest_word_count = LEAST(issue_description_word_count, email_word_count)").Wait();
+            Console.Write("\rsmallest_word_count has been set in tables.      \n");
+        }
+
         public static void CreateExpandedTables()
         {
             Console.Write("Creating tables...");
@@ -44,6 +65,7 @@ namespace databaseEditor.Database
                         " issue_modified timestamp," +
                         " email_word_count integer," +
                         " issue_description_word_count integer," +
+                        " smallest_word_count integer," +
                         " email_thread_id integer," +
                         " issue_parent_key text," +
                         " creation_time_difference integer);",
@@ -58,6 +80,7 @@ namespace databaseEditor.Database
                         " issue_modified timestamp," +
                         " email_word_count integer," +
                         " issue_description_word_count integer," +
+                        " smallest_word_count integer," +
                         " email_thread_id integer," +
                         " issue_parent_key text," +
                         " creation_time_difference integer);"
@@ -81,17 +104,54 @@ namespace databaseEditor.Database
             Console.Write("\rInserted into tables.      \n");
         }
 
-        private static async Task ExecuteSQL(string sql)
+        public static void ApplyWordCountFilterExportAsNewTable()
         {
-            var con = new NpgsqlConnection(
-                        connectionString: "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
-            con.Open();
-            var command = new NpgsqlCommand()
-            {
-                Connection = con,
-                CommandText = sql
-            };
-            await command.ExecuteNonQueryAsync();
+            Console.Write("Creating new table 'arch_emails_all_issues_word_filtered'...");
+            ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_emails_all_issues_word_filtered AS " +
+                "SELECT * FROM expanded_arch_emails_all_issues " +
+                "WHERE smallest_word_count >= 50").Wait();
+            ExecuteSQL("ALTER TABLE arch_emails_all_issues_word_filtered" +
+                " ALTER COLUMN id SET NOT NULL," +
+                " ALTER COLUMN email_id SET NOT NULL," +
+                " ADD PRIMARY KEY (id)," +
+                " ALTER COLUMN issue_key SET NOT NULL;").Wait();
+            Console.Write("\rCreated table 'arch_emails_all_issues_word_filtered'.      \n");
+
+            Console.Write("Creating new table 'arch_issues_all_emails_word_filtered'...");
+            ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_issues_all_emails_word_filtered AS " +
+                "SELECT * FROM expanded_arch_issues_all_emails " +
+                "WHERE smallest_word_count >= 50").Wait();
+            ExecuteSQL("ALTER TABLE arch_issues_all_emails_word_filtered" +
+                " ALTER COLUMN id SET NOT NULL," +
+                " ALTER COLUMN email_id SET NOT NULL," +
+                " ADD PRIMARY KEY (id)," +
+                " ALTER COLUMN issue_key SET NOT NULL;").Wait();
+            Console.Write("\rCreated table 'arch_issues_all_emails_word_filtered'.      \n");
+        }
+
+        public static void ApplCreationTimeDifferenceFilterExportAsNewTable()
+        {
+            Console.Write("Creating new table 'arch_emails_all_issues_word_and_creation_time_filtered'...");
+            ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_emails_all_issues_word_and_creation_time_filtered AS " +
+                "SELECT * FROM arch_emails_all_issues_word_filtered " +
+                "WHERE creation_time_difference <= 700").Wait();
+            ExecuteSQL("ALTER TABLE arch_emails_all_issues_word_and_creation_time_filtered" +
+                " ALTER COLUMN id SET NOT NULL," +
+                " ALTER COLUMN email_id SET NOT NULL," +
+                " ADD PRIMARY KEY (id)," +
+                " ALTER COLUMN issue_key SET NOT NULL;").Wait();
+            Console.Write("\rCreated table 'arch_emails_all_issues_word_and_creation_time_filtered'.      \n");
+
+            Console.Write("Creating new table 'arch_issues_all_emails_word_and_creation_time_filtered'...");
+            ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_issues_all_emails_word_and_creation_time_filtered AS " +
+                "SELECT * FROM arch_issues_all_emails_word_filtered " +
+                "WHERE creation_time_difference <= 700").Wait();
+            ExecuteSQL("ALTER TABLE arch_issues_all_emails_word_and_creation_time_filtered" +
+                " ALTER COLUMN id SET NOT NULL," +
+                " ALTER COLUMN email_id SET NOT NULL," +
+                " ADD PRIMARY KEY (id)," +
+                " ALTER COLUMN issue_key SET NOT NULL;").Wait();
+            Console.Write("\rCreated table 'arch_issues_all_emails_word_and_creation_time_filtered'.      \n");
         }
 
         #region GetTables
@@ -125,6 +185,22 @@ namespace databaseEditor.Database
             var listOfExpandedArchEmailsAllIssuesPairs = dbContext.ExpandedArchIssuesAllEmails.ToList();
             Console.Write("\rLoaded expanded ArchIssuesAllEmails table.      \n");
             return listOfExpandedArchEmailsAllIssuesPairs;
+        }
+
+        public static List<ArchEmailsAllIssuesWordAndCreationTimeFiltered> GetMaxFilteredArchEmailAllIssue(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading max filtered ArchIssuesAllEmails table...");
+            var listOfMaxFilteredArchEmailsAllIssuesPairs = dbContext.ArchEmailsAllIssuesWordAndCreationTimeFiltereds.ToList();
+            Console.Write("\rLoaded max filtered ArchIssuesAllEmails table.      \n");
+            return listOfMaxFilteredArchEmailsAllIssuesPairs;
+        }
+
+        public static List<ArchIssuesAllEmailsWordAndCreationTimeFiltered> GetMaxFilteredArchIssueAllEmail(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading max filtered ArchIssuesAllEmails table...");
+            var listOfMaxFilteredArchEmailsAllIssuesPairs = dbContext.ArchIssuesAllEmailsWordAndCreationTimeFiltereds.ToList();
+            Console.Write("\rLoaded max filtered ArchIssuesAllEmails table.      \n");
+            return listOfMaxFilteredArchEmailsAllIssuesPairs;
         }
 
         #endregion GetTables

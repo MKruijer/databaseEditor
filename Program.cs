@@ -44,7 +44,7 @@ internal class Program
             {
                 DatabaseFunctions.InsertInExpandedTables();
             }
-            if (UIFunctions.CheckIfUserWantsToTakeAction("Fill in new data in expanded table"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("fill in new data in expanded table"))
             {
                 var listOfEmails = DatabaseFunctions.GetEmails(db);
                 var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
@@ -53,7 +53,43 @@ internal class Program
                 ExpandedTableLogic.FillInAdditionalDataInExpandedTable(listOfEmails, listOfJiraIssues, listOfExpandedArchEmailsAllIssuesPairs, listOfExpandedArchIssuesAllEmailsPairs);
                 DatabaseFunctions.SaveDatabase(db);
             }
-            if (UIFunctions.CheckIfUserWantsToTakeAction("Fill in Jira issue parent key data in expanded tables"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("apply word limit filter (remove entries with less than 50 words) and export as new table"))
+            {
+                DatabaseFunctions.ApplyWordCountFilterExportAsNewTable();
+            }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("apply creation time difference filter (remove entries with a creation time difference greater than 700 days) and export as new table"))
+            {
+                DatabaseFunctions.ApplCreationTimeDifferenceFilterExportAsNewTable();
+            }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("fill in Jira issue parent key data in max filtered tables"))
+            {
+                var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
+                var listOfFilteredPairs = DatabaseFunctions.GetMaxFilteredArchEmailAllIssue(db).OrderByDescending(pair => pair.Similarity).ToList().Take(1000).ToList();
+                List<string> jiraKeyList = new List<string>();
+                listOfFilteredPairs.ForEach(pair => jiraKeyList.Add(pair.IssueKey));
+                var dictionary = JiraApiFunctions.GetParentDictionaryFromJiraIssues(jiraKeyList);
+                listOfFilteredPairs.ForEach(pair =>
+                {
+                    pair.IssueParentKey = dictionary[pair.IssueKey].ParentIssueKey ?? pair.IssueKey;
+                });
+                DatabaseFunctions.SaveDatabase(db);
+
+            }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("fill in Jira issue parent key data in max filtered tables"))
+            {
+                var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
+                var listOfFilteredPairs = DatabaseFunctions.GetMaxFilteredArchIssueAllEmail(db).OrderByDescending(pair => pair.Similarity).ToList().Take(1000).ToList();
+                List<string> jiraKeyList = new List<string>();
+                listOfFilteredPairs.ForEach(pair => jiraKeyList.Add(pair.IssueKey));
+                var dictionary = JiraApiFunctions.GetParentDictionaryFromJiraIssues(jiraKeyList);
+                listOfFilteredPairs.ForEach(pair =>
+                {
+                    pair.IssueParentKey = dictionary[pair.IssueKey].ParentIssueKey ?? pair.IssueKey;
+                });
+                DatabaseFunctions.SaveDatabase(db);
+
+            }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("fill in Jira issue parent key data in expanded tables"))
             {
                 var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
                 var listOfExpandedArchEmailsAllIssuesPairs = DatabaseFunctions.GetExpandedArchEmailsAllIssues(db);
