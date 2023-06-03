@@ -26,7 +26,7 @@ public partial class DataJiraJiraIssue
 
     public DateTime? Modified { get; set; }
 
-    public long? DescriptionWordCount { get; set; }
+    public int? DescriptionWordCount { get; set; }
 
     public string? ParentKey { get; set; }
 

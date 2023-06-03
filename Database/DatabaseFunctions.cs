@@ -25,43 +25,63 @@ namespace databaseEditor.Database
             Console.Write("\rDB changes succesfully saved.\n");
         }
 
-        #region GetTables
-        public static List<DataEmailEmail> GetEmails(RelationsDbContext dbContext)
+        public static void CreateExpandedTables()
         {
-            Console.Write("Loading email data...");
-            var listOfEmails = dbContext.DataEmailEmails.ToList();
-            Console.Write("\rLoaded email data.      \n");
-            return listOfEmails;
+            Console.Write("Creating tables...");
+            List<String> createExpandedTablesSQL = new List<string>()
+                {
+                    "CREATE SEQUENCE IF NOT EXISTS expanded_arch_issues_all_emails_id_seq AS integer;",
+
+                    "CREATE SEQUENCE IF NOT EXISTS expanded_arch_emails_all_issues_id_seq AS integer;",
+
+                    "CREATE TABLE IF NOT EXISTS expanded_arch_issues_all_emails " +
+                        "(id integer default nextval('expanded_arch_issues_all_emails_id_seq'::regclass) not null primary key," +
+                        " email_id integer not null," +
+                        " issue_key text not null," +
+                        " similarity numeric," +
+                        " email_date timestamp," +
+                        " issue_created timestamp," +
+                        " issue_modified timestamp," +
+                        " email_word_count integer," +
+                        " issue_description_word_count integer," +
+                        " email_thread_id integer," +
+                        " issue_parent_key text," +
+                        " creation_time_difference integer);",
+
+                    "CREATE TABLE IF NOT EXISTS expanded_arch_emails_all_issues" +
+                    "(id integer default nextval('expanded_arch_emails_all_issues_id_seq'::regclass) not null primary key," +
+                        " email_id integer not null," +
+                        " issue_key text not null," +
+                        " similarity numeric," +
+                        " email_date timestamp," +
+                        " issue_created timestamp," +
+                        " issue_modified timestamp," +
+                        " email_word_count integer," +
+                        " issue_description_word_count integer," +
+                        " email_thread_id integer," +
+                        " issue_parent_key text," +
+                        " creation_time_difference integer);"
+                };
+            createExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
+            Console.Write("\rCreated tables.      \n");
         }
 
-        public static List<DataJiraJiraIssue> GetJiraIssues(RelationsDbContext dbContext)
+        public static void InsertInExpandedTables()
         {
-            Console.Write("Loading JIRA issues data...");
-            var listOfJiraIssues = dbContext.DataJiraJiraIssues.ToList();
-            Console.Write("\rLoaded Jira issues data.      \n");
-            return listOfJiraIssues;
+            Console.Write("Inserting into tables...");
+            List<String> fillInExpandedTablesSQL = new List<string>()
+                {
+                    "INSERT INTO expanded_arch_emails_all_issues (email_id, issue_key, similarity) " +
+                    "SELECT email_id, issue_key, similarity FROM result_arch_emails_all_issues WHERE similarity > 0.1;",
+
+                    "INSERT INTO expanded_arch_issues_all_emails (email_id, issue_key, similarity)" +
+                    "SELECT email_id, issue_key, similarity FROM result_arch_issues_all_emails WHERE similarity > 0.1;"
+                };
+            fillInExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
+            Console.Write("\rInserted into tables.      \n");
         }
 
-        public static List<ModifiedArchEmailsAllIssue> GetModifiedArchEmailsAllIssues(RelationsDbContext dbContext)
-        {
-            Console.Write("Loading modified results ArchEmailsAllIssues table...");
-            var listOfModifiedArchEmailsAllIssues = dbContext.ModifiedArchEmailsAllIssues.ToList();
-            Console.Write("\rLoaded modified results ArchEmailsAllIssues data.      \n");
-            return listOfModifiedArchEmailsAllIssues;
-
-        }
-
-        public static List<ModifiedArchIssuesAllEmail> GetModifiedArchIssuesAllEmails(RelationsDbContext dbContext)
-        {
-            Console.Write("Loading modified results ArchEmailsAllIssues table...");
-            var listOfModifiedArchIssuesAllEmails = dbContext.ModifiedArchIssuesAllEmails.ToList();
-            Console.Write("\rLoaded modified results ArchEmailsAllIssues data.      \n");
-            return listOfModifiedArchIssuesAllEmails;
-
-        }
-
-        #endregion GetTables
-        public static async Task ExecuteSQL(string sql)
+        private static async Task ExecuteSQL(string sql)
         {
             var con = new NpgsqlConnection(
                         connectionString: "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
@@ -73,5 +93,40 @@ namespace databaseEditor.Database
             };
             await command.ExecuteNonQueryAsync();
         }
+
+        #region GetTables
+        public static List<DataEmailEmail> GetEmails(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading email table...");
+            var listOfEmails = dbContext.DataEmailEmails.ToList();
+            Console.Write("\rLoaded email table.      \n");
+            return listOfEmails;
+        }
+
+        public static List<DataJiraJiraIssue> GetJiraIssues(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading JIRA issues table...");
+            var listOfJiraIssues = dbContext.DataJiraJiraIssues.ToList();
+            Console.Write("\rLoaded Jira issues table.      \n");
+            return listOfJiraIssues;
+        }
+
+        public static List<ExpandedArchEmailsAllIssue> GetExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading expanded ArchEmailsAllIssues table...");
+            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.ExpandedArchEmailsAllIssues.ToList();
+            Console.Write("\rLoaded expanded ArchEmailsAllIssues table.      \n");
+            return listOfExpandedArchEmailsAllIssuesPairs;
+        }
+
+        public static List<ExpandedArchIssuesAllEmail> GetExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading expanded ArchIssuesAllEmails table...");
+            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.ExpandedArchIssuesAllEmails.ToList();
+            Console.Write("\rLoaded expanded ArchIssuesAllEmails table.      \n");
+            return listOfExpandedArchEmailsAllIssuesPairs;
+        }
+
+        #endregion GetTables
     }
 }

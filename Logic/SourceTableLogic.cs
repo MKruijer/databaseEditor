@@ -23,7 +23,7 @@ namespace databaseEditor.Logic
             {
                 try
                 {
-                    email.ThreadId = GetTopParentIdRecursively(listOfEmails, email);
+                    email.ThreadId = GetEmailTopParentIdRecursively(listOfEmails, email);
                 } catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
@@ -34,7 +34,7 @@ namespace databaseEditor.Logic
             Console.Write("\rFilling in thread id completed.\n");
         }
 
-        private static int GetTopParentIdRecursively(List<DataEmailEmail> listOfEmails, DataEmailEmail email)
+        private static int GetEmailTopParentIdRecursively(List<DataEmailEmail> listOfEmails, DataEmailEmail email)
         {
             if (email.ParentId == null)
             {
@@ -49,7 +49,7 @@ namespace databaseEditor.Logic
                 {
                     throw new Exception($"Email with id {email.Id} has parent but can't find parent. Probably an invalid dataset.");
                 }
-                return GetTopParentIdRecursively(listOfEmails, parentEmail);
+                return GetEmailTopParentIdRecursively(listOfEmails, parentEmail);
             }
         }
 
@@ -89,19 +89,6 @@ namespace databaseEditor.Logic
                 UIFunctions.PrintStatusUpdate(++currentAmountOfJiraJiraIssuesDone, totalAmountOfJiraJiraIssues);
             }
             Console.Write("\rFilling in word count completed.\n");
-        }
-
-        public static void FillInJiraParentKeys(List<DataJiraJiraIssue> listOfJiraJiraIssues)
-        {
-            var totalAmountOfJiraJiraIssues = listOfJiraJiraIssues.Count();
-            int currentAmountOfJiraJiraIssuesDone = 0;
-            Console.WriteLine("Starting filling in parent keys...");
-            foreach (var JiraJiraIssue in listOfJiraJiraIssues)
-            {
-                JiraJiraIssue.ParentKey = JiraApiObject.GetTopParentJiraIssueKeyFromJiraIssueKey(JiraJiraIssue.Key);
-                UIFunctions.PrintStatusUpdate(++currentAmountOfJiraJiraIssuesDone, totalAmountOfJiraJiraIssues);
-            }
-            Console.Write("\rFilling in parent keys completed.\n");
         }
     }
 }

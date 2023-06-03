@@ -11,17 +11,6 @@ namespace databaseEditor.Logic
 {
     public static class ModifiedTableLogic
     {
-        public static void InsertDataFromOldTableToNewTable()
-        {
-            List<string> columnNames = new List<string>{
-                                                            "email_id",
-                                                            "issue_key",
-                                                            "similarity",
-                                                        };
-            InsertDataFromOldTableIntoNewTable("result_arch_emails_all_issues", "modified_results_arch_emails_all_issues", columnNames);
-            InsertDataFromOldTableIntoNewTable("result_arch_issues_all_emails", "modified_results_arch_issues_all_emails", columnNames);
-        }
-
         public static void FillInModifyTables(List<DataEmailEmail> listOfEmails, List<DataJiraJiraIssue> listOfJiraIssues, List<ModifiedArchEmailsAllIssue> listOfModifiedArchEmailsAllIssuePairs, List<ModifiedArchIssuesAllEmail> listOfModifiedArchIssuesAllEmailPairs)
         {
             FillInModifiedArchEmailsAllIssueNewEmailData(listOfModifiedArchEmailsAllIssuePairs, listOfEmails);
@@ -31,37 +20,6 @@ namespace databaseEditor.Logic
             FillInModifiedArchIssuesAllEmailNewEmailData(listOfModifiedArchIssuesAllEmailPairs, listOfEmails);
             FillInModifiedArchIssuesAllEmailIssueDescription(listOfModifiedArchIssuesAllEmailPairs, listOfJiraIssues);
             FillInModifiedArchIssuesAllEmailCreationTimeDifference(listOfModifiedArchIssuesAllEmailPairs);
-        }
-
-        private static void InsertDataFromOldTableIntoNewTable(string oldTable, string newTable, List<string> columnNames)
-        {
-            Console.Write($"Inserting columns: ");
-            columnNames.ForEach(columnName => Console.WriteLine($"{columnName} "));
-            Console.Write($"from {oldTable} into {newTable}...");
-            if (columnNames.Count == 0) return;
-            var sqlString = $"INSERT INTO {newTable} ";
-            if (columnNames.Count == 1)
-            {
-                sqlString += $"({columnNames[0]})\nSELECT {columnNames[0]}\nFROM {oldTable}";
-            }
-            else
-            {
-                sqlString += $"({columnNames[0]}";
-                for (int i = 1; i < columnNames.Count; i++)
-                {
-                    sqlString += $", {columnNames[i]}";
-                }
-                sqlString += $")\nSELECT {columnNames[0]}";
-                for (int i = 1; i < columnNames.Count; i++)
-                {
-                    sqlString += $", {columnNames[i]}";
-                }
-                sqlString += $"\nFROM {oldTable}";
-            }
-            DatabaseFunctions.ExecuteSQL(sqlString).Wait();
-            Console.Write($"\rInserted columns {columnNames}");
-            columnNames.ForEach(columnName => Console.WriteLine($"{columnName} "));
-            Console.Write($"from {oldTable} into {newTable}.   ");
         }
 
         private static void FillInModifiedArchEmailsAllIssueNewEmailData(List<ModifiedArchEmailsAllIssue> listOfModifiedCosinePairs, List<DataEmailEmail> listOfEmails)

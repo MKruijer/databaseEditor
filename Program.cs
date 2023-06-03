@@ -9,59 +9,60 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        //string url = "https://issues.apache.org/jira/browse/HADOOP-249";
-
-        //using (HttpClient client = new HttpClient())
-        //{
-        //    HttpResponseMessage response = client.GetAsync(url).Result;
-
-        //    if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-        //    {
-        //        Console.WriteLine("API rate limit exceeded!");
-        //    }
-        //    if (response.Headers.Contains("RetryAfter") || response.Headers.Contains("Warning"))
-        //    {
-        //        string retryAfter = response.Headers.GetValues("RetryAfter").FirstOrDefault();
-        //        string warning = response.Headers.GetValues("Warning").FirstOrDefault();
-
-        //        Console.WriteLine($"retryAfter: {retryAfter}, Warning: {warning}");
-        //    }
-        //}
-
-
-
         using (var db = DatabaseFunctions.GetPostgresContext())
         {
-            if (UIFunctions.CheckIfUserWantsToTakeAction("update changes"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("update 1000 jira issue parent keys in source table"))
             {
-                var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
-                SourceTableLogic.FillInJiraParentKeys(listOfJiraIssues);
+                var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db).Where(issue => issue.ParentKey == null).Take(1000).ToList();
+                if (listOfJiraIssues.Count < 1000)
+                {
+                    Console.WriteLine("Less than 1000 issues found without a filled in parent key.");
+                }
+                List<string> jiraKeyList = new List<string>();
+                listOfJiraIssues.ForEach(jiraIssue => jiraKeyList.Add(jiraIssue.Key));
+                Console.Write("Fetching data from API...");
+                var dictionary = JiraApiFunctions.GetParentDictionaryFromJiraIssues(jiraKeyList);
+                Console.Write("\rFetched data from API.      \n");
+                listOfJiraIssues.ForEach(issue =>
+                {
+                    issue.ParentKey = dictionary[issue.Key].ParentIssueKey ?? issue.Key;
+                });
+                DatabaseFunctions.SaveDatabase(db);
             }
-                if (UIFunctions.CheckIfUserWantsToTakeAction("edit source tables"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("edit source tables"))
             {
                 var listOfEmails = DatabaseFunctions.GetEmails(db);
                 var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
                 SourceTableLogic.FillInSourceTables(listOfEmails, listOfJiraIssues);
                 DatabaseFunctions.SaveDatabase(db);
             }
-            if (UIFunctions.CheckIfUserWantsToTakeAction("edit modify table"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("create expanded tables"))
+            {
+                DatabaseFunctions.CreateExpandedTables();
+            }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("insert data to expanded table"))
+            {
+                DatabaseFunctions.InsertInExpandedTables();
+            }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("Fill in new data in expanded table"))
             {
                 var listOfEmails = DatabaseFunctions.GetEmails(db);
                 var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
-                var listOfModifiedResultsArchEmailsAllIssuePairs = DatabaseFunctions.GetModifiedArchEmailsAllIssues(db);
-                var listOfModifiedResultsArchIssuesAllEmailPairs = DatabaseFunctions.GetModifiedArchIssuesAllEmails(db);
-                ModifiedTableLogic.FillInModifyTables(listOfEmails, listOfJiraIssues, listOfModifiedResultsArchEmailsAllIssuePairs, listOfModifiedResultsArchIssuesAllEmailPairs);
+                var listOfExpandedArchEmailsAllIssuesPairs = DatabaseFunctions.GetExpandedArchEmailsAllIssues(db);
+                var listOfExpandedArchIssuesAllEmailsPairs = DatabaseFunctions.GetExpandedArchIssuesAllEmails(db);
+                ExpandedTableLogic.FillInAdditionalDataInExpandedTable(listOfEmails, listOfJiraIssues, listOfExpandedArchEmailsAllIssuesPairs, listOfExpandedArchIssuesAllEmailsPairs);
                 DatabaseFunctions.SaveDatabase(db);
             }
-            if (UIFunctions.CheckIfUserWantsToTakeAction("fill in jira parentKey"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("Fill in Jira issue parent key data in expanded tables"))
             {
-                var listOfModifiedResultsArchEmailsAllIssuePairs = DatabaseFunctions.GetModifiedArchEmailsAllIssues(db).Where(pair => pair.IssueParentKey == null).OrderByDescending(pair => pair.Similarity).Take(1000).ToList(); ;
-                var listOfModifiedResultsArchIssuesAllEmailPairs = DatabaseFunctions.GetModifiedArchIssuesAllEmails(db).Where(pair => pair.IssueParentKey == null).OrderByDescending(pair => pair.Similarity).Take(1000).ToList(); ;
-                ModifiedTableLogic.FillInArchEmailsAllIssueJiraParent(listOfModifiedResultsArchEmailsAllIssuePairs);
-                ModifiedTableLogic.FillInArchIssuesAllEmailJiraParent(listOfModifiedResultsArchIssuesAllEmailPairs);
+                var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
+                var listOfExpandedArchEmailsAllIssuesPairs = DatabaseFunctions.GetExpandedArchEmailsAllIssues(db);
+                var listOfExpandedArchIssuesAllEmailsPairs = DatabaseFunctions.GetExpandedArchIssuesAllEmails(db);
+                ExpandedTableLogic.FillInJiraIssueParentKeyInArchIssuesAllEmail(listOfExpandedArchIssuesAllEmailsPairs, listOfJiraIssues);
+                ExpandedTableLogic.FillInJiraIssueParentKeyInArchEmailsAllIssues(listOfExpandedArchEmailsAllIssuesPairs, listOfJiraIssues);
                 DatabaseFunctions.SaveDatabase(db);
             }
+            Console.WriteLine("Shutting down.");
         }
-        Console.WriteLine("Shutting down.");
     }
 }

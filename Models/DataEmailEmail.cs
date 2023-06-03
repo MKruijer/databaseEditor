@@ -30,7 +30,7 @@ public partial class DataEmailEmail
 
     public int? ThreadId { get; set; }
 
-    public long? WordCount { get; set; }
+    public int? WordCount { get; set; }
 
     public virtual ICollection<ResultArchEmailsAllIssue> ResultArchEmailsAllIssues { get; set; } = new List<ResultArchEmailsAllIssue>();
 

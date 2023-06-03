@@ -2,7 +2,7 @@ alter table data_email_email
 	add thread_id integer;
 
 alter table data_email_email
-	add word_count bigint;
+	add word_count integer;
 
 alter table data_email_email
     alter column parent_id type integer using parent_id::integer;
@@ -17,7 +17,7 @@ alter table data_email_email_tag
     alter column tag_id type integer using tag_id::integer;
 
 alter table data_jira_jira_issue
-	add description_word_count bigint;
+	add description_word_count integer;
 
 alter table data_jira_jira_issue
 	add parent_key text;
