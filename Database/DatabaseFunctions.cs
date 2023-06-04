@@ -134,7 +134,7 @@ namespace databaseEditor.Database
             Console.Write("Creating new table 'arch_emails_all_issues_word_and_creation_time_filtered'...");
             ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_emails_all_issues_word_and_creation_time_filtered AS " +
                 "SELECT * FROM arch_emails_all_issues_word_filtered " +
-                "WHERE creation_time_difference <= 700").Wait();
+                "WHERE creation_time_difference <= 500").Wait();
             ExecuteSQL("ALTER TABLE arch_emails_all_issues_word_and_creation_time_filtered" +
                 " ALTER COLUMN id SET NOT NULL," +
                 " ALTER COLUMN email_id SET NOT NULL," +
@@ -145,7 +145,7 @@ namespace databaseEditor.Database
             Console.Write("Creating new table 'arch_issues_all_emails_word_and_creation_time_filtered'...");
             ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_issues_all_emails_word_and_creation_time_filtered AS " +
                 "SELECT * FROM arch_issues_all_emails_word_filtered " +
-                "WHERE creation_time_difference <= 700").Wait();
+                "WHERE creation_time_difference <= 500").Wait();
             ExecuteSQL("ALTER TABLE arch_issues_all_emails_word_and_creation_time_filtered" +
                 " ALTER COLUMN id SET NOT NULL," +
                 " ALTER COLUMN email_id SET NOT NULL," +

@@ -57,7 +57,7 @@ internal class Program
             {
                 DatabaseFunctions.ApplyWordCountFilterExportAsNewTable();
             }
-            if (UIFunctions.CheckIfUserWantsToTakeAction("apply creation time difference filter (remove entries with a creation time difference greater than 700 days) and export as new table"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("apply creation time difference filter (remove entries with a creation time difference greater than 500 days) and export as new table"))
             {
                 DatabaseFunctions.ApplCreationTimeDifferenceFilterExportAsNewTable();
             }

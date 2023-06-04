@@ -2,10 +2,10 @@ CREATE TABLE analysis_unique_pairs_arch_issues_all_emails AS
 SELECT t.id, t.email_id, t.issue_key, t.similarity, t.email_word_count, t.issue_description_word_count, LEAST(email_word_count, issue_description_word_count) as smallest_word_countas, t.creation_time_difference, t.email_thread_id, t.issue_parent_key
 FROM (
   SELECT email_thread_id, issue_parent_key, MAX(similarity) AS max_similarity
-  FROM modified_arch_issues_all_emails
+  FROM arch_issues_all_emails_word_and_creation_time_filtered
   GROUP BY email_thread_id, issue_parent_key
 ) AS subq
-JOIN modified_arch_issues_all_emails AS t
+JOIN arch_issues_all_emails_word_and_creation_time_filtered AS t
   ON t.email_thread_id = subq.email_thread_id
   AND t.issue_parent_key = subq.issue_parent_key
   AND t.similarity = subq.max_similarity
@@ -16,10 +16,10 @@ CREATE TABLE analysis_unique_pairs_arch_emails_all_issues AS
 SELECT t.id, t.email_id, t.issue_key, t.similarity, t.email_word_count, t.issue_description_word_count, LEAST(email_word_count, issue_description_word_count) as smallest_word_countas, t.creation_time_difference, t.email_thread_id, t.issue_parent_key
 FROM (
   SELECT email_thread_id, issue_parent_key, MAX(similarity) AS max_similarity
-  FROM modified_arch_emails_all_issues
+  FROM arch_emails_all_issues_word_and_creation_time_filtered
   GROUP BY email_thread_id, issue_parent_key
 ) AS subq
-JOIN modified_arch_emails_all_issues AS t
+JOIN arch_emails_all_issues_word_and_creation_time_filtered AS t
   ON t.email_thread_id = subq.email_thread_id
   AND t.issue_parent_key = subq.issue_parent_key
   AND t.similarity = subq.max_similarity
