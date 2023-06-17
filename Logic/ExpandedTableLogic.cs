@@ -15,19 +15,19 @@ namespace databaseEditor.Logic
                                                                List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
                                                                List<ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs)
         {
-            FillInNewEmailDataInArchEmailsAllIssues(listOfExpandedArchEmailsAllIssuesPairs, listOfEmails);
-            FillInNewEmailDataInArchIssuesAllEmails(listOfExpandedArchIssuesAllEmailsPairs, listOfEmails);
+            FillInNewEmailData(listOfExpandedArchEmailsAllIssuesPairs, listOfEmails);
+            FillInNewEmailData(listOfExpandedArchIssuesAllEmailsPairs, listOfEmails);
 
-            FillInNewIssueDataInArchEmailsAllIssues(listOfExpandedArchEmailsAllIssuesPairs, listOfJiraIssues);
-            FillInNewIssueDataInArchIssuesAllEmails(listOfExpandedArchIssuesAllEmailsPairs, listOfJiraIssues);         
+            FillInNewIssueData(listOfExpandedArchEmailsAllIssuesPairs, listOfJiraIssues);
+            FillInNewIssueData(listOfExpandedArchIssuesAllEmailsPairs, listOfJiraIssues);         
 
-            FillInCreationTimeDifferenceInArchEmailsAllIssues(listOfExpandedArchEmailsAllIssuesPairs);
-            FillInCreationTimeDifferenceInArchIssuesAllEmails(listOfExpandedArchIssuesAllEmailsPairs);
+            FillInCreationTimeDifference(listOfExpandedArchEmailsAllIssuesPairs);
+            FillInCreationTimeDifference(listOfExpandedArchIssuesAllEmailsPairs);
 
             DatabaseFunctions.SetSmallestWordCount();
         }
 
-        private static void FillInNewIssueDataInArchEmailsAllIssues(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
+        private static void FillInNewIssueData(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
                                                                     List<DataJiraJiraIssue> listOfJiraIssues)
         {
             var totalAmountOfPairs = listOfExpandedArchEmailsAllIssuesPairs.Count();
@@ -46,7 +46,7 @@ namespace databaseEditor.Logic
             Console.WriteLine();
         }
         
-        private static void FillInNewIssueDataInArchIssuesAllEmails(List<ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs,
+        private static void FillInNewIssueData(List<ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs,
                                                                     List<DataJiraJiraIssue> listOfJiraIssues)
         {
             var totalAmountOfPairs = listOfExpandedArchIssuesAllEmailsPairs.Count();
@@ -65,7 +65,7 @@ namespace databaseEditor.Logic
             Console.WriteLine();
         }
 
-        private static void FillInNewEmailDataInArchEmailsAllIssues(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
+        private static void FillInNewEmailData(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
                                                                     List<DataEmailEmail> listOfEmails)
         {
             var totalAmountOfPairs = listOfExpandedArchEmailsAllIssuesPairs.Count();
@@ -83,7 +83,7 @@ namespace databaseEditor.Logic
             Console.WriteLine();
         }
 
-        private static void FillInNewEmailDataInArchIssuesAllEmails(List<ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs,
+        private static void FillInNewEmailData(List<ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs,
                                                                     List<DataEmailEmail> listOfEmails)
         {
             var totalAmountOfPairs = listOfExpandedArchIssuesAllEmailsPairs.Count();
@@ -101,7 +101,7 @@ namespace databaseEditor.Logic
             Console.WriteLine();
         }
 
-        private static void FillInCreationTimeDifferenceInArchEmailsAllIssues(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs)
+        private static void FillInCreationTimeDifference(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs)
         {
             var totalAmountOfPairs = listOfExpandedArchEmailsAllIssuesPairs.Count();
             int currentAmountOfPairsDone = 0;
@@ -125,7 +125,7 @@ namespace databaseEditor.Logic
             Console.WriteLine();
         }
 
-        private static void FillInCreationTimeDifferenceInArchIssuesAllEmails(List<ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs)
+        private static void FillInCreationTimeDifference(List<ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs)
         {
             var totalAmountOfPairs = listOfExpandedArchIssuesAllEmailsPairs.Count();
             int currentAmountOfPairsDone = 0;

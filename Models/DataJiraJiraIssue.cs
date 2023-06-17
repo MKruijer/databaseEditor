@@ -35,4 +35,8 @@ public partial class DataJiraJiraIssue
     public virtual ICollection<ResultArchEmailsAllIssue> ResultArchEmailsAllIssues { get; set; } = new List<ResultArchEmailsAllIssue>();
 
     public virtual ICollection<ResultArchIssuesAllEmail> ResultArchIssuesAllEmails { get; set; } = new List<ResultArchIssuesAllEmail>();
+
+    public virtual ICollection<SimResultArchEmailsAllIssue> SimResultArchEmailsAllIssues { get; set; } = new List<SimResultArchEmailsAllIssue>();
+
+    public virtual ICollection<SimResultArchIssuesAllEmail> SimResultArchIssuesAllEmails { get; set; } = new List<SimResultArchIssuesAllEmail>();
 }

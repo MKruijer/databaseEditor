@@ -36,5 +36,9 @@ public partial class DataEmailEmail
 
     public virtual ICollection<ResultArchIssuesAllEmail> ResultArchIssuesAllEmails { get; set; } = new List<ResultArchIssuesAllEmail>();
 
+    public virtual ICollection<SimResultArchEmailsAllIssue> SimResultArchEmailsAllIssues { get; set; } = new List<SimResultArchEmailsAllIssue>();
+
+    public virtual ICollection<SimResultArchIssuesAllEmail> SimResultArchIssuesAllEmails { get; set; } = new List<SimResultArchIssuesAllEmail>();
+
     public virtual ICollection<DataEmailTag> Tags { get; set; } = new List<DataEmailTag>();
 }

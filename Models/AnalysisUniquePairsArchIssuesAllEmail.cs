@@ -13,11 +13,11 @@ public partial class AnalysisUniquePairsArchIssuesAllEmail
 
     public decimal? Similarity { get; set; }
 
-    public long? EmailWordCount { get; set; }
+    public int? EmailWordCount { get; set; }
 
-    public long? IssueDescriptionWordCount { get; set; }
+    public int? IssueDescriptionWordCount { get; set; }
 
-    public long? SmallestWordCountas { get; set; }
+    public int? SmallestWordCountas { get; set; }
 
     public int? CreationTimeDifference { get; set; }
 

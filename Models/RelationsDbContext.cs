@@ -47,6 +47,14 @@ public partial class RelationsDbContext : DbContext
 
     public virtual DbSet<ResultArchIssuesAllEmail> ResultArchIssuesAllEmails { get; set; }
 
+    public virtual DbSet<SimExpandedArchEmailsAllIssue> SimExpandedArchEmailsAllIssues { get; set; }
+
+    public virtual DbSet<SimExpandedArchIssuesAllEmail> SimExpandedArchIssuesAllEmails { get; set; }
+
+    public virtual DbSet<SimResultArchEmailsAllIssue> SimResultArchEmailsAllIssues { get; set; }
+
+    public virtual DbSet<SimResultArchIssuesAllEmail> SimResultArchIssuesAllEmails { get; set; }
+
     public virtual DbSet<UniqueEmailThreadArchEmailAllIssue> UniqueEmailThreadArchEmailAllIssues { get; set; }
 
     public virtual DbSet<UniqueEmailThreadArchIssueAllEmail> UniqueEmailThreadArchIssueAllEmails { get; set; }
@@ -459,6 +467,96 @@ public partial class RelationsDbContext : DbContext
                 .HasConstraintName("RESULT_arch_issues_all_emails_issue_key_fkey");
         });
 
+        modelBuilder.Entity<SimExpandedArchEmailsAllIssue>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("sim_expanded_arch_emails_all_issues_pkey");
+
+            entity.ToTable("sim_expanded_arch_emails_all_issues");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("email_date");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.IssueCreated)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_created");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<SimExpandedArchIssuesAllEmail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("sim_expanded_arch_issues_all_emails_pkey");
+
+            entity.ToTable("sim_expanded_arch_issues_all_emails");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("email_date");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.IssueCreated)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_created");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<SimResultArchEmailsAllIssue>(entity =>
+        {
+            entity.HasKey(e => new { e.IssueKey, e.EmailId }).HasName("SIM_RESULT_arch_emails_all_issues_pkey");
+
+            entity.ToTable("sim_result_arch_emails_all_issues");
+
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+
+            entity.HasOne(d => d.Email).WithMany(p => p.SimResultArchEmailsAllIssues)
+                .HasForeignKey(d => d.EmailId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("SIM_RESULT_arch_emails_all_issues_email_id_fkey");
+
+            entity.HasOne(d => d.IssueKeyNavigation).WithMany(p => p.SimResultArchEmailsAllIssues)
+                .HasForeignKey(d => d.IssueKey)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("SIM_RESULT_arch_emails_all_issues_issue_key_fkey");
+        });
+
+        modelBuilder.Entity<SimResultArchIssuesAllEmail>(entity =>
+        {
+            entity.HasKey(e => new { e.IssueKey, e.EmailId }).HasName("SIM_RESULT_arch_issues_all_emails_pkey");
+
+            entity.ToTable("sim_result_arch_issues_all_emails");
+
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+
+            entity.HasOne(d => d.Email).WithMany(p => p.SimResultArchIssuesAllEmails)
+                .HasForeignKey(d => d.EmailId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("SIM_RESULT_arch_issues_all_emails_email_id_fkey");
+
+            entity.HasOne(d => d.IssueKeyNavigation).WithMany(p => p.SimResultArchIssuesAllEmails)
+                .HasForeignKey(d => d.IssueKey)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("SIM_RESULT_arch_issues_all_emails_issue_key_fkey");
+        });
+
         modelBuilder.Entity<UniqueEmailThreadArchEmailAllIssue>(entity =>
         {
             entity
@@ -514,6 +612,8 @@ public partial class RelationsDbContext : DbContext
         modelBuilder.HasSequence<int>("expanded_arch_issues_all_emails_id_seq");
         modelBuilder.HasSequence<int>("modified_arch_emails_all_issues_id_seq");
         modelBuilder.HasSequence<int>("modified_arch_issues_all_emails_id_seq");
+        modelBuilder.HasSequence<int>("sim_expanded_arch_emails_all_issues_id_seq");
+        modelBuilder.HasSequence<int>("sim_expanded_arch_issues_all_emails_id_seq");
 
         OnModelCreatingPartial(modelBuilder);
     }
