@@ -41,31 +41,3 @@ SELECT email_id, issue_key, similarity FROM result_arch_emails_all_issues WHERE 
 
 INSERT INTO modified_arch_issues_all_emails (email_id, issue_key, similarity)
 SELECT email_id, issue_key, similarity FROM result_arch_issues_all_emails WHERE similarity > 0.1;
-
-
-CREATE TABLE unique_email_thread_arch_issue_all_email AS
-SELECT t.*
-FROM (
-  SELECT email_thread_id, issue_key, MAX(similarity) AS max_similarity
-  FROM modified_arch_issues_all_emails
-  GROUP BY email_thread_id, issue_key
-) AS subq
-JOIN modified_arch_issues_all_emails AS t
-  ON t.email_thread_id = subq.email_thread_id
-  AND t.issue_key = subq.issue_key
-  AND t.similarity = subq.max_similarity
-ORDER BY t.similarity DESC;
-
-
-CREATE TABLE unique_email_thread_arch_email_all_issue AS
-SELECT t.*
-FROM (
-  SELECT email_thread_id, issue_key, MAX(similarity) AS max_similarity
-  FROM modified_arch_emails_all_issues
-  GROUP BY email_thread_id, issue_key
-) AS subq
-JOIN modified_arch_emails_all_issues AS t
-  ON t.email_thread_id = subq.email_thread_id
-  AND t.issue_key = subq.issue_key
-  AND t.similarity = subq.max_similarity
-ORDER BY t.similarity DESC;

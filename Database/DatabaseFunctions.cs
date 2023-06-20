@@ -39,13 +39,73 @@ namespace databaseEditor.Database
             await command.ExecuteNonQueryAsync();
         }
 
-        public static void SetSmallestWordCount()
+        #region SharedFunctions
+
+        public static void SetSmallestWordCount(string tableName)
         {
-            Console.Write("Setting smallest_word_count in tables...");
-            ExecuteSQL("UPDATE expanded_arch_emails_all_issues SET smallest_word_count = LEAST(issue_description_word_count, email_word_count)").Wait();
-            ExecuteSQL("UPDATE expanded_arch_issues_all_emails SET smallest_word_count = LEAST(issue_description_word_count, email_word_count)").Wait();
-            Console.Write("\rsmallest_word_count has been set in tables.      \n");
+            Console.Write($"Setting smallest_word_count in {tableName}...");
+            ExecuteSQL($"UPDATE {tableName} SET smallest_word_count = LEAST(issue_description_word_count, email_word_count)").Wait();
+            Console.Write($"\rsmallest_word_count has been set in {tableName}.      \n");
         }
+
+        public static void ApplyWordCountFilterExportAsNewTable(string newTableName, string sourceTableName)
+        {
+            Console.Write($"Creating new table '{newTableName}'...");
+            ExecuteSQL($"CREATE TABLE IF NOT EXISTS {newTableName} AS " +
+                $"SELECT * FROM {sourceTableName} " +
+                $"WHERE smallest_word_count >= 50").Wait();
+            ExecuteSQL($"ALTER TABLE {newTableName}" +
+                $" ALTER COLUMN id SET NOT NULL," +
+                $" ALTER COLUMN email_id SET NOT NULL," +
+                $" ADD PRIMARY KEY (id)," +
+                $" ALTER COLUMN issue_key SET NOT NULL;").Wait();
+            Console.Write($"\rCreated table '{newTableName}'.      \n");
+        }
+
+        public static void ApplyCreationTimeDifferenceFilterExportAsNewTable(string newTableName, string sourceTableName)
+        {
+            Console.Write($"Creating new table '{newTableName}'...");
+            ExecuteSQL($"CREATE TABLE IF NOT EXISTS {newTableName} AS " +
+                $"SELECT * FROM {sourceTableName} " +
+                $"WHERE creation_time_difference <= 500").Wait();
+            ExecuteSQL($"ALTER TABLE {newTableName}" +
+                $" ALTER COLUMN id SET NOT NULL," +
+                $" ALTER COLUMN email_id SET NOT NULL," +
+                $" ADD PRIMARY KEY (id)," +
+                $" ALTER COLUMN issue_key SET NOT NULL;").Wait();
+            Console.Write($"\rCreated table 'arch_emails_all_issues_word_and_creation_time_filtered'.      \n");
+        }
+
+        public static void ApplyDuplicationFilterExportAsNewTable(string newTableName, string sourceTableName)
+        {
+            Console.Write($"Creating new table '{newTableName}'...");
+            ExecuteSQL($"""
+                CREATE TABLE {newTableName} AS
+                SELECT t.id, t.email_id, t.issue_key, t.similarity, t.smallest_word_count, t.creation_time_difference, t.email_thread_id, t.issue_parent_key
+                FROM (
+                  SELECT email_thread_id, issue_parent_key, MAX(similarity) AS max_similarity
+                  FROM {sourceTableName}
+                  GROUP BY email_thread_id, issue_parent_key
+                ) AS subq
+                JOIN {sourceTableName} AS t
+                  ON t.email_thread_id = subq.email_thread_id
+                  AND t.issue_parent_key = subq.issue_parent_key
+                  AND t.similarity = subq.max_similarity
+                ORDER BY t.similarity DESC;
+                """).Wait();
+            ExecuteSQL($"""
+                ALTER TABLE {newTableName}
+                ALTER COLUMN id SET NOT NULL,
+                ALTER COLUMN email_id SET NOT NULL,
+                ALTER COLUMN issue_key SET NOT NULL,
+                ADD PRIMARY KEY (id);
+                """).Wait();
+            Console.Write($"\rCreated table '{newTableName}'.      \n");
+        }
+
+        #endregion SharedFunctions
+
+        #region Iteration1Functions
 
         public static void CreateExpandedTables()
         {
@@ -89,6 +149,25 @@ namespace databaseEditor.Database
             createExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
             Console.Write("\rCreated tables.      \n");
         }
+
+        public static void InsertInExpandedTables()
+        {
+            Console.Write("Inserting into tables...");
+            List<String> fillInExpandedTablesSQL = new List<string>()
+                {
+                    "INSERT INTO expanded_arch_emails_all_issues (email_id, issue_key, similarity) " +
+                    "SELECT email_id, issue_key, similarity FROM result_arch_emails_all_issues WHERE similarity > 0.1;",
+
+                    "INSERT INTO expanded_arch_issues_all_emails (email_id, issue_key, similarity)" +
+                    "SELECT email_id, issue_key, similarity FROM result_arch_issues_all_emails WHERE similarity > 0.1;"
+                };
+            fillInExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
+            Console.Write("\rInserted into tables.      \n");
+        }
+
+        #endregion Iteration1Functions
+
+        #region Iteration2Functions
 
         public static void CreateExpandedSimilarityTables()
         {
@@ -136,80 +215,48 @@ namespace databaseEditor.Database
             Console.Write("Inserting into tables...");
             List<String> fillInExpandedTablesSQL = new List<string>()
                 {
-                    "INSERT INTO sim_expanded_arch_emails_all_issues (email_id, issue_key, similarity) " +
-                    "SELECT email_id, issue_key, similarity FROM sim_result_arch_emails_all_issues WHERE similarity > 0.35;",
+                    """
+                    INSERT INTO sim_expanded_arch_emails_all_issues (email_id, issue_key, similarity, email_date, email_thread_id, issue_created, issue_parent_key)
+                    SELECT
+                        s.email_id,
+                        s.issue_key,
+                        s.similarity,
+                        e.date,
+                        e.thread_id,
+                        j.created,
+                        j.parent_key
+                    FROM
+                        sim_result_arch_emails_all_issues AS s
+                        JOIN data_email_email AS e ON s.email_id = e.id
+                        JOIN data_jira_jira_issue AS j ON s.issue_key = j.key
+                    WHERE
+                        s.similarity > 0.35;
+                    
+                    """,
+                    """
+                    INSERT INTO sim_expanded_arch_issues_all_emails (email_id, issue_key, similarity, email_date, email_thread_id, issue_created, issue_parent_key)
+                    SELECT
+                        s.email_id,
+                        s.issue_key,
+                        s.similarity,
+                        e.date,
+                        e.thread_id,
+                        j.created,
+                        j.parent_key
+                    FROM
+                        sim_result_arch_issues_all_emails AS s
+                        JOIN data_email_email AS e ON s.email_id = e.id
+                        JOIN data_jira_jira_issue AS j ON s.issue_key = j.key
+                    WHERE
+                        s.similarity > 0.35;
 
-                    "INSERT INTO sim_expanded_arch_issues_all_emails (email_id, issue_key, similarity)" +
-                    "SELECT email_id, issue_key, similarity FROM sim_result_arch_issues_all_emails WHERE similarity > 0.35;"
+                    """
                 };
             fillInExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait(TimeSpan.FromSeconds(300)));
             Console.Write("\rInserted into tables.      \n");
         }
 
-        public static void InsertInExpandedTables()
-        {
-            Console.Write("Inserting into tables...");
-            List<String> fillInExpandedTablesSQL = new List<string>()
-                {
-                    "INSERT INTO expanded_arch_emails_all_issues (email_id, issue_key, similarity) " +
-                    "SELECT email_id, issue_key, similarity FROM result_arch_emails_all_issues WHERE similarity > 0.1;",
-
-                    "INSERT INTO expanded_arch_issues_all_emails (email_id, issue_key, similarity)" +
-                    "SELECT email_id, issue_key, similarity FROM result_arch_issues_all_emails WHERE similarity > 0.1;"
-                };
-            fillInExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
-            Console.Write("\rInserted into tables.      \n");
-        }
-
-        public static void ApplyWordCountFilterExportAsNewTable()
-        {
-            Console.Write("Creating new table 'arch_emails_all_issues_word_filtered'...");
-            ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_emails_all_issues_word_filtered AS " +
-                "SELECT * FROM expanded_arch_emails_all_issues " +
-                "WHERE smallest_word_count >= 50").Wait();
-            ExecuteSQL("ALTER TABLE arch_emails_all_issues_word_filtered" +
-                " ALTER COLUMN id SET NOT NULL," +
-                " ALTER COLUMN email_id SET NOT NULL," +
-                " ADD PRIMARY KEY (id)," +
-                " ALTER COLUMN issue_key SET NOT NULL;").Wait();
-            Console.Write("\rCreated table 'arch_emails_all_issues_word_filtered'.      \n");
-
-            Console.Write("Creating new table 'arch_issues_all_emails_word_filtered'...");
-            ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_issues_all_emails_word_filtered AS " +
-                "SELECT * FROM expanded_arch_issues_all_emails " +
-                "WHERE smallest_word_count >= 50").Wait();
-            ExecuteSQL("ALTER TABLE arch_issues_all_emails_word_filtered" +
-                " ALTER COLUMN id SET NOT NULL," +
-                " ALTER COLUMN email_id SET NOT NULL," +
-                " ADD PRIMARY KEY (id)," +
-                " ALTER COLUMN issue_key SET NOT NULL;").Wait();
-            Console.Write("\rCreated table 'arch_issues_all_emails_word_filtered'.      \n");
-        }
-
-        public static void ApplCreationTimeDifferenceFilterExportAsNewTable()
-        {
-            Console.Write("Creating new table 'arch_emails_all_issues_word_and_creation_time_filtered'...");
-            ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_emails_all_issues_word_and_creation_time_filtered AS " +
-                "SELECT * FROM arch_emails_all_issues_word_filtered " +
-                "WHERE creation_time_difference <= 500").Wait();
-            ExecuteSQL("ALTER TABLE arch_emails_all_issues_word_and_creation_time_filtered" +
-                " ALTER COLUMN id SET NOT NULL," +
-                " ALTER COLUMN email_id SET NOT NULL," +
-                " ADD PRIMARY KEY (id)," +
-                " ALTER COLUMN issue_key SET NOT NULL;").Wait();
-            Console.Write("\rCreated table 'arch_emails_all_issues_word_and_creation_time_filtered'.      \n");
-
-            Console.Write("Creating new table 'arch_issues_all_emails_word_and_creation_time_filtered'...");
-            ExecuteSQL("CREATE TABLE IF NOT EXISTS arch_issues_all_emails_word_and_creation_time_filtered AS " +
-                "SELECT * FROM arch_issues_all_emails_word_filtered " +
-                "WHERE creation_time_difference <= 500").Wait();
-            ExecuteSQL("ALTER TABLE arch_issues_all_emails_word_and_creation_time_filtered" +
-                " ALTER COLUMN id SET NOT NULL," +
-                " ALTER COLUMN email_id SET NOT NULL," +
-                " ADD PRIMARY KEY (id)," +
-                " ALTER COLUMN issue_key SET NOT NULL;").Wait();
-            Console.Write("\rCreated table 'arch_issues_all_emails_word_and_creation_time_filtered'.      \n");
-        }
+        #endregion Iteration2Functions
 
         #region GetTables
         public static List<DataEmailEmail> GetEmails(RelationsDbContext dbContext)
@@ -258,6 +305,22 @@ namespace databaseEditor.Database
             var listOfMaxFilteredArchEmailsAllIssuesPairs = dbContext.ArchIssuesAllEmailsWordAndCreationTimeFiltereds.ToList();
             Console.Write("\rLoaded max filtered ArchIssuesAllEmails table.      \n");
             return listOfMaxFilteredArchEmailsAllIssuesPairs;
+        }
+
+        public static List<SimArchEmailsAllIssuesWordAndCreationTimeFiltered> GetSimMaxFilteredArchEmailAllIssue(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading sim max filtered ArchIssuesAllEmails table...");
+            var SimMaxFilteredSimArchEmailsAllIssuesPairs = dbContext.SimArchEmailsAllIssuesWordAndCreationTimeFiltereds.ToList();
+            Console.Write("\rLoaded sim max filtered ArchIssuesAllEmails table.      \n");
+            return SimMaxFilteredSimArchEmailsAllIssuesPairs;
+        }
+
+        public static List<SimArchIssuesAllEmailsWordAndCreationTimeFiltered> GetSimMaxFilteredArchIssueAllEmail(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading sim max filtered ArchIssuesAllEmails table...");
+            var SimMaxFilteredSimArchIssuesAllEmailsPairs = dbContext.SimArchIssuesAllEmailsWordAndCreationTimeFiltereds.ToList();
+            Console.Write("\rLoaded sim max filtered ArchIssuesAllEmails table.      \n");
+            return SimMaxFilteredSimArchIssuesAllEmailsPairs;
         }
 
         public static List<SimExpandedArchEmailsAllIssue> GetSimExpandedArchEmailsAllIssues(RelationsDbContext dbContext)

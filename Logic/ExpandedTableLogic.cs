@@ -24,7 +24,8 @@ namespace databaseEditor.Logic
             FillInCreationTimeDifference(listOfExpandedArchEmailsAllIssuesPairs);
             FillInCreationTimeDifference(listOfExpandedArchIssuesAllEmailsPairs);
 
-            DatabaseFunctions.SetSmallestWordCount();
+            DatabaseFunctions.SetSmallestWordCount("expanded_arch_emails_all_issues");
+            DatabaseFunctions.SetSmallestWordCount("expanded_arch_issues_all_emails");
         }
 
         private static void FillInNewIssueData(List<ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
