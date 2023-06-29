@@ -1,5 +1,8 @@
-﻿using databaseEditor.jira;
+﻿using databaseEditor.Database;
+using databaseEditor.jira;
 using databaseEditor.Models;
+using System.Text.Json;
+
 namespace databaseEditor.Logic
 {
     /// <summary>
@@ -7,6 +10,67 @@ namespace databaseEditor.Logic
     /// </summary>
     public static class SourceTableLogic
     {
+        public static void UpdateJiraIssueCategories(List<DataJiraJiraIssue> listOfJiraIssues)
+        {
+            // Get the base directory of the application
+            string currentDirectory = Directory.GetCurrentDirectory();
+            string projectDirectory = Directory.GetParent(currentDirectory).Parent.Parent.FullName;
+            string jsonPath;
+            Dictionary<string, Entry> entries = new Dictionary<string, Entry>();
+            // Construct the file path
+            try
+            {
+                jsonPath = Path.Combine(projectDirectory, "textFiles", "updatedIssueCategories.json");
+                if (!File.Exists(jsonPath))
+                {
+                    Console.WriteLine("File does not exist or the path is incorrect.");
+                }
+                else
+                {
+                    string jsonContent = File.ReadAllText(jsonPath);
+                    entries = JsonSerializer.Deserialize<Dictionary<string, Entry>>(jsonContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            if (entries == null)
+            {
+                Console.WriteLine("Deserialized json is empty");
+            }
+            else
+            {
+                var con = DatabaseFunctions.GetPostgresConnection();
+                Console.Write("Creating tasks...");
+                var totalAmountOfPairs = entries.Count();
+                int currentAmountOfPairsDone = 0;
+                Console.WriteLine("Starting updating jira issue categories...");
+                foreach (var entry in entries)
+                {
+                    var key = entry.Key;
+                    if(key == "CASSANDRA-18223")
+                    {
+                        Thread.Sleep(50);
+                    }
+                    var isExistence = entry.Value.label.existence;
+                    var isProperty = entry.Value.label.property;
+                    var isExecutive = entry.Value.label.executive;
+                    var sql = $"UPDATE data_jira_jira_issue SET is_design = {isExistence || isExecutive || isProperty}::boolean, is_cat_existence = {isExistence}::boolean, is_cat_executive = {isExecutive}::boolean, is_cat_property = {isProperty}::boolean WHERE key = '{key}'";
+                    var result = DatabaseFunctions.UpdateJiraCategory(con, sql).GetAwaiter().GetResult();
+                    if (result != 1)
+                    {
+                        Console.WriteLine($"ERROR WITH ISSUE WITH KEY {key}");
+                    }
+                    UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
+                }
+                Console.Write("\rUpdating jira issue categories completed.     \n");
+                Console.WriteLine();
+                con.Close();
+            }
+        }
+
+
         public static void FillInSourceTables(List<DataEmailEmail> listOfEmails, List<DataJiraJiraIssue> listOfJiraIssues)
         {
             FillEmailThreadIds(listOfEmails);

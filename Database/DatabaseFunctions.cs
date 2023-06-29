@@ -1,7 +1,9 @@
 ﻿using databaseEditor.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,7 +39,32 @@ namespace databaseEditor.Database
                 CommandTimeout = 300
             };
             await command.ExecuteNonQueryAsync();
+            con.Close();
         }
+
+        #region UpdateFunctions
+
+        public static NpgsqlConnection GetPostgresConnection()
+        {
+            var con = new NpgsqlConnection(
+                        connectionString: "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
+            con.Open();
+            return con;
+        }
+
+        public static async Task<int> UpdateJiraCategory(NpgsqlConnection con, string sql)
+        {
+            var command = new NpgsqlCommand()
+            {
+                Connection = con,
+                CommandText = sql,
+                CommandTimeout = 300
+            };
+            var result = await command.ExecuteNonQueryAsync();
+            return result;
+        }
+
+        #endregion UpdateFunctions
 
         #region SharedFunctions
 
@@ -257,6 +284,55 @@ namespace databaseEditor.Database
         }
 
         #endregion Iteration2Functions
+
+        #region Iteration3Functions
+
+        public static void CreateAverageSimilarityArchEmailsAllIssues()
+        {
+            var sql = """
+                                CREATE TABLE average_similarity_arch_emails_all_issues AS
+                SELECT
+                    t1.id,
+                    t1.email_id,
+                    t1.issue_key,
+                    t1.smallest_word_count,
+                    t1.creation_time_difference,
+                    t1.email_thread_id,
+                    t1.issue_parent_key,
+                    t1.similarity as sentence_similarity,
+                    t2.similarity AS cosine_similarity,
+                    (t1.similarity + t2.similarity) / 2 AS average_similarity
+                FROM
+                    unique_filtered_sim_arch_emails_all_issues AS t1
+                    JOIN analysis_unique_pairs_arch_emails_all_issues AS t2 ON t1.email_id = t2.email_id AND t1.issue_key = t2.issue_key;
+                
+                """;
+            ExecuteSQL(sql).Wait();
+        }
+        public static void CreateAverageSimilarityArchIssuesAllEmails()
+        {
+            var sql = """
+                                CREATE TABLE average_similarity_arch_issues_all_emails AS
+                SELECT
+                    t1.id,
+                    t1.email_id,
+                    t1.issue_key,
+                    t1.smallest_word_count,
+                    t1.creation_time_difference,
+                    t1.email_thread_id,
+                    t1.issue_parent_key,
+                    t1.similarity as sentence_similarity,
+                    t2.similarity AS cosine_similarity,
+                    (t1.similarity + t2.similarity) / 2 AS average_similarity
+                FROM
+                    unique_filtered_sim_arch_issues_all_emails AS t1
+                    JOIN analysis_unique_pairs_arch_issues_all_emails AS t2 ON t1.email_id = t2.email_id AND t1.issue_key = t2.issue_key;
+                
+                """;
+            ExecuteSQL(sql).Wait();
+        }
+
+        #endregion Iteration3Functions
 
         #region GetTables
         public static List<DataEmailEmail> GetEmails(RelationsDbContext dbContext)

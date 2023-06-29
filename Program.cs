@@ -32,6 +32,10 @@ internal class Program
             {
                 FilterIteration2Functions(db);
             }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("filter iteration 3"))
+            {
+                FilterIteration3Functions(db);
+            }
             if (UIFunctions.CheckIfUserWantsToTakeAction("Jira issue parent functions"))
             {
                 DoJiraIssueParentFunctions(db);
@@ -40,8 +44,44 @@ internal class Program
         Console.WriteLine("Shutting down.");
     }
 
+    private static void FilterIteration3Functions(RelationsDbContext db)
+    {
+        if (UIFunctions.CheckIfUserWantsToTakeAction("create average_similarity_arch_emails_all_issues"))
+        {
+            DatabaseFunctions.CreateAverageSimilarityArchEmailsAllIssues();
+        }
+        if (UIFunctions.CheckIfUserWantsToTakeAction("create average_similarity_arch_issues_all_emails"))
+        {
+            DatabaseFunctions.CreateAverageSimilarityArchIssuesAllEmails();
+        }
+    }
+
     private static void EditSourceTableFunctions(RelationsDbContext db)
     {
+        if (UIFunctions.CheckIfUserWantsToTakeAction("all remaining jira issue parent keys in source table"))
+        {
+            var listOfAllRemainingJiraIssues = DatabaseFunctions.GetJiraIssues(db).Where(issue => issue.ParentKey == null).ToList();
+            var batchSize = 1000;
+            for (int i = 0; i < listOfAllRemainingJiraIssues.Count(); i+=batchSize)
+            {
+                var listOfBatchJiraIssues = listOfAllRemainingJiraIssues.Skip(i).Take(batchSize).ToList();
+                if (listOfBatchJiraIssues.Count < 1000)
+                {
+                    Console.WriteLine("Less than 1000 issues found without a filled in parent key.");
+                }
+                List<string> jiraKeyList = new List<string>();
+                listOfBatchJiraIssues.ForEach(jiraIssue => jiraKeyList.Add(jiraIssue.Key));
+                Console.Write("Fetching data from API...");
+                var dictionary = JiraApiFunctions.GetParentDictionaryFromJiraIssues(jiraKeyList);
+                Console.Write("\rFetched data from API.      \n");
+                listOfBatchJiraIssues.ForEach(issue =>
+                {
+                    issue.ParentKey = dictionary[issue.Key].ParentIssueKey ?? issue.Key;
+                });
+                DatabaseFunctions.SaveDatabase(db);
+                Thread.Sleep(60000);
+            }
+        }
         if (UIFunctions.CheckIfUserWantsToTakeAction("update 1000 jira issue parent keys in source table"))
         {
             var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db).Where(issue => issue.ParentKey == null).Take(1000).ToList();
@@ -67,6 +107,14 @@ internal class Program
             SourceTableLogic.FillInSourceTables(listOfEmails, listOfJiraIssues);
             DatabaseFunctions.SaveDatabase(db);
         }
+        if (UIFunctions.CheckIfUserWantsToTakeAction("update categories / is_design in data_jira_jira_issue with new data json"))
+        {
+            var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
+            SourceTableLogic.UpdateJiraIssueCategories(listOfJiraIssues);
+            DatabaseFunctions.SaveDatabase(db);
+        }
+
+
     }
 
     private static void PrepareIteration1Functions(RelationsDbContext db)
