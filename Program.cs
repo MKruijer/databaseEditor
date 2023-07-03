@@ -48,11 +48,23 @@ internal class Program
     {
         if (UIFunctions.CheckIfUserWantsToTakeAction("create average_similarity_arch_emails_all_issues"))
         {
-            DatabaseFunctions.CreateAverageSimilarityArchEmailsAllIssues();
+            DatabaseFunctions.CreateAverageSimilarityArchEmailsAllIssues(3, "analysis_unique_pairs_arch_emails_all_issues", "unique_filtered_sim_arch_emails_all_issues");
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("create average_similarity_arch_issues_all_emails"))
         {
-            DatabaseFunctions.CreateAverageSimilarityArchIssuesAllEmails();
+            DatabaseFunctions.CreateAverageSimilarityArchIssuesAllEmails(3, "analysis_unique_pairs_arch_issues_all_emails", "unique_filtered_sim_arch_issues_all_emails");
+        }
+    }
+
+    private static void FilterIteration4Functions(RelationsDbContext db)
+    {
+        if (UIFunctions.CheckIfUserWantsToTakeAction("create iter4_average_similarity_arch_emails_all_issues"))
+        {
+            DatabaseFunctions.CreateAverageSimilarityArchEmailsAllIssues(4, "analysis_unique_pairs_arch_emails_all_issues", "unique_filtered_sim_arch_emails_all_issues");
+        }
+        if (UIFunctions.CheckIfUserWantsToTakeAction("create iter4_average_similarity_arch_issues_all_emails"))
+        {
+            DatabaseFunctions.CreateAverageSimilarityArchIssuesAllEmails(4, "analysis_unique_pairs_arch_issues_all_emails", "unique_filtered_sim_arch_issues_all_emails");
         }
     }
 
@@ -156,7 +168,8 @@ internal class Program
     {
         if (UIFunctions.CheckIfUserWantsToTakeAction("create sim-expanded tables"))
         {
-            DatabaseFunctions.CreateExpandedSimilarityTables();
+            DatabaseFunctions.CreateExpandedSimilarityTables("sim_expanded_arch_issues_all_emails");
+            DatabaseFunctions.CreateExpandedSimilarityTables("sim_expanded_arch_emails_all_issues");
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("insert old data to expanded table"))
         {

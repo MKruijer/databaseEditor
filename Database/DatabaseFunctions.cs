@@ -1,5 +1,6 @@
 ﻿using databaseEditor.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -194,19 +195,21 @@ namespace databaseEditor.Database
 
         #endregion Iteration1Functions
 
-        #region Iteration2Functions
+        #region ExpandingTablesFunctions
 
-        public static void CreateExpandedSimilarityTables()
+        /// <summary>
+        /// Creates a new table with extra columns which are required for filtering
+        /// </summary>
+        /// <param name="newTableName">Name of the new table</param>
+        public static void CreateExpandedSimilarityTables(string newTableName)
         {
             Console.Write("Creating tables...");
             List<String> createExpandedTablesSQL = new List<string>()
                 {
-                    "CREATE SEQUENCE IF NOT EXISTS sim_expanded_arch_issues_all_emails_id_seq AS integer;",
+                    $"CREATE SEQUENCE IF NOT EXISTS {newTableName}_id_seq AS integer;",
 
-                    "CREATE SEQUENCE IF NOT EXISTS sim_expanded_arch_emails_all_issues_id_seq AS integer;",
-
-                    "CREATE TABLE IF NOT EXISTS sim_expanded_arch_issues_all_emails " +
-                        "(id integer default nextval('sim_expanded_arch_issues_all_emails_id_seq'::regclass) not null primary key," +
+                    $"CREATE TABLE IF NOT EXISTS {newTableName} " +
+                        $"(id integer default nextval('{newTableName}_id_seq'::regclass) not null primary key," +
                         " email_id integer not null," +
                         " issue_key text not null," +
                         " similarity numeric," +
@@ -218,32 +221,23 @@ namespace databaseEditor.Database
                         " email_thread_id integer," +
                         " issue_parent_key text," +
                         " creation_time_difference integer);",
-
-                    "CREATE TABLE IF NOT EXISTS sim_expanded_arch_emails_all_issues" +
-                    "(id integer default nextval('sim_expanded_arch_emails_all_issues_id_seq'::regclass) not null primary key," +
-                        " email_id integer not null," +
-                        " issue_key text not null," +
-                        " similarity numeric," +
-                        " email_date timestamp," +
-                        " issue_created timestamp," +
-                        " email_word_count integer," +
-                        " issue_description_word_count integer," +
-                        " smallest_word_count integer," +
-                        " email_thread_id integer," +
-                        " issue_parent_key text," +
-                        " creation_time_difference integer);"
                 };
             createExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
             Console.Write("\rCreated tables.      \n");
         }
 
-        public static void InsertInExpandedSimilarityTables()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sourceTableName">Name of the table which contains the data</param>
+        /// <param name="targetTableName">Name of the table in which the data gets insterted</param>
+        /// <param name="similarityThreshold">Get pairs with a similarity score above this threshold</param>
+        public static void InsertInExpandedSimilarityTables(string targetTableName, string sourceTableName, float similarityThreshold)
         {
             Console.Write("Inserting into tables...");
-            List<String> fillInExpandedTablesSQL = new List<string>()
-                {
-                    """
-                    INSERT INTO sim_expanded_arch_emails_all_issues (email_id, issue_key, similarity, email_date, email_thread_id, issue_created, issue_parent_key)
+            var fillInExpandedTablesSQL =
+                $"""
+                    INSERT INTO {targetTableName} (email_id, issue_key, similarity, email_date, email_thread_id, issue_created, issue_parent_key)
                     SELECT
                         s.email_id,
                         s.issue_key,
@@ -253,44 +247,25 @@ namespace databaseEditor.Database
                         j.created,
                         j.parent_key
                     FROM
-                        sim_result_arch_emails_all_issues AS s
+                        {sourceTableName} AS s
                         JOIN data_email_email AS e ON s.email_id = e.id
                         JOIN data_jira_jira_issue AS j ON s.issue_key = j.key
                     WHERE
-                        s.similarity > 0.35;
+                        s.similarity > {similarityThreshold};
                     
-                    """,
-                    """
-                    INSERT INTO sim_expanded_arch_issues_all_emails (email_id, issue_key, similarity, email_date, email_thread_id, issue_created, issue_parent_key)
-                    SELECT
-                        s.email_id,
-                        s.issue_key,
-                        s.similarity,
-                        e.date,
-                        e.thread_id,
-                        j.created,
-                        j.parent_key
-                    FROM
-                        sim_result_arch_issues_all_emails AS s
-                        JOIN data_email_email AS e ON s.email_id = e.id
-                        JOIN data_jira_jira_issue AS j ON s.issue_key = j.key
-                    WHERE
-                        s.similarity > 0.35;
-
-                    """
-                };
-            fillInExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait(TimeSpan.FromSeconds(300)));
+                    """;
+            ExecuteSQL(fillInExpandedTablesSQL).Wait(TimeSpan.FromSeconds(300));
             Console.Write("\rInserted into tables.      \n");
         }
 
-        #endregion Iteration2Functions
+        #endregion ExpandingTablesFunctions
 
         #region Iteration3Functions
 
-        public static void CreateAverageSimilarityArchEmailsAllIssues()
+        public static void CreateAverageSimilarityArchEmailsAllIssues(int iteration, string sourceTableCosineSimilarity, string sourceTableSentenceSimilarity)
         {
-            var sql = """
-                                CREATE TABLE average_similarity_arch_emails_all_issues AS
+            var sql = $"""
+                                CREATE TABLE iter{iteration}_average_similarity_arch_emails_all_issues AS
                 SELECT
                     t1.id,
                     t1.email_id,
@@ -303,16 +278,16 @@ namespace databaseEditor.Database
                     t2.similarity AS cosine_similarity,
                     (t1.similarity + t2.similarity) / 2 AS average_similarity
                 FROM
-                    unique_filtered_sim_arch_emails_all_issues AS t1
-                    JOIN analysis_unique_pairs_arch_emails_all_issues AS t2 ON t1.email_id = t2.email_id AND t1.issue_key = t2.issue_key;
+                    {sourceTableSentenceSimilarity} AS t1
+                    JOIN {sourceTableCosineSimilarity} AS t2 ON t1.email_id = t2.email_id AND t1.issue_key = t2.issue_key;
                 
                 """;
             ExecuteSQL(sql).Wait();
         }
-        public static void CreateAverageSimilarityArchIssuesAllEmails()
+        public static void CreateAverageSimilarityArchIssuesAllEmails(int iteration, string sourceTableCosineSimilarity, string sourceTableSentenceSimilarity)
         {
-            var sql = """
-                                CREATE TABLE average_similarity_arch_issues_all_emails AS
+            var sql = $"""
+                                CREATE TABLE iter{iteration}_average_similarity_arch_issues_all_emails AS
                 SELECT
                     t1.id,
                     t1.email_id,
@@ -325,8 +300,8 @@ namespace databaseEditor.Database
                     t2.similarity AS cosine_similarity,
                     (t1.similarity + t2.similarity) / 2 AS average_similarity
                 FROM
-                    unique_filtered_sim_arch_issues_all_emails AS t1
-                    JOIN analysis_unique_pairs_arch_issues_all_emails AS t2 ON t1.email_id = t2.email_id AND t1.issue_key = t2.issue_key;
+                    {sourceTableSentenceSimilarity} AS t1
+                    JOIN {sourceTableCosineSimilarity} AS t2 ON t1.email_id = t2.email_id AND t1.issue_key = t2.issue_key;
                 
                 """;
             ExecuteSQL(sql).Wait();
