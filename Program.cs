@@ -8,6 +8,8 @@ using System.Text.Json;
 namespace databaseEditor;
 internal class Program
 {
+    private const int NumberOfThreads = 11;
+
     static void Main(string[] args)
     {
         using (var db = DatabaseFunctions.GetPostgresContext())
@@ -36,6 +38,14 @@ internal class Program
             {
                 FilterIteration3Functions(db);
             }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("prepare iteration 4"))
+            {
+                PrepareIteration4Functions(db);
+            }
+            if (UIFunctions.CheckIfUserWantsToTakeAction("filter iteration 4"))
+            {
+                FilterIteration4Functions(db);
+            }
             if (UIFunctions.CheckIfUserWantsToTakeAction("Jira issue parent functions"))
             {
                 DoJiraIssueParentFunctions(db);
@@ -56,15 +66,45 @@ internal class Program
         }
     }
 
+    private static void PrepareIteration4Functions(RelationsDbContext db)
+    {
+        if (UIFunctions.CheckIfUserWantsToTakeAction("create expanded tables"))
+        {
+            DatabaseFunctions.CreateExpandedSimilarityTables("iter4_sen_sim_expanded_arch_issues_all_emails");
+            DatabaseFunctions.CreateExpandedSimilarityTables("iter4_cos_sim_expanded_arch_issues_all_emails");
+        }
+        if (UIFunctions.CheckIfUserWantsToTakeAction("insert data to expanded table"))
+        {
+            DatabaseFunctions.InsertInExpandedSimilarityTables("iter4_sen_sim_expanded_arch_issues_all_emails", "iter4_sen_sim_result_arch_issues_all_emails", 0.35f);
+            DatabaseFunctions.InsertInExpandedSimilarityTables("iter4_cos_sim_expanded_arch_issues_all_emails", "iter4_cos_sim_result_arch_issues_all_emails", 0.1f);
+        }
+        if (UIFunctions.CheckIfUserWantsToTakeAction("fill in word count and creation time difference in expanded table"))
+        {
+            var listOfEmails = DatabaseFunctions.GetEmails(db);
+            var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
+            var listOfIter4SenSimExpandedArchIssuesAllEmails = DatabaseFunctions.GetIter4SenSimExpandedArchIssuesAllEmails(db);
+            var listOfIter4CosSimExpandedArchIssuesAllEmails = DatabaseFunctions.GetIter4CosSimExpandedArchIssuesAllEmails(db);
+            Iter4Logic.RunMultiThreadedFillInAdditionalData(listOfEmails, listOfJiraIssues, listOfIter4SenSimExpandedArchIssuesAllEmails, NumberOfThreads);
+            Iter4Logic.RunMultiThreadedFillInAdditionalData(listOfEmails, listOfJiraIssues, listOfIter4CosSimExpandedArchIssuesAllEmails, NumberOfThreads);
+            DatabaseFunctions.SaveDatabase(db);
+        }
+        if (UIFunctions.CheckIfUserWantsToTakeAction("set smallest word count in sim expanded tables"))
+        {
+            DatabaseFunctions.SetSmallestWordCount("iter4_sen_sim_expanded_arch_issues_all_emails");
+            DatabaseFunctions.SetSmallestWordCount("iter4_cos_sim_expanded_arch_issues_all_emails");
+        }
+    }
+
     private static void FilterIteration4Functions(RelationsDbContext db)
     {
-        if (UIFunctions.CheckIfUserWantsToTakeAction("create iter4_average_similarity_arch_emails_all_issues"))
+        if (UIFunctions.CheckIfUserWantsToTakeAction("create filtered arch_issues_all_emails tables"))
         {
-            DatabaseFunctions.CreateAverageSimilarityArchEmailsAllIssues(4, "analysis_unique_pairs_arch_emails_all_issues", "unique_filtered_sim_arch_emails_all_issues");
+            DatabaseFunctions.CreateFilteredArchIssuesAllEmails("iter4_cos_sim_expanded_arch_issues_all_emails ", "iter4_cos_sim_filtered_arch_issues_all_emails");
+            DatabaseFunctions.CreateFilteredArchIssuesAllEmails("iter4_sen_sim_expanded_arch_issues_all_emails ", "iter4_sen_sim_filtered_arch_issues_all_emails");
         }
-        if (UIFunctions.CheckIfUserWantsToTakeAction("create iter4_average_similarity_arch_issues_all_emails"))
+        if (UIFunctions.CheckIfUserWantsToTakeAction("create average similarity arch_issues_all_emails tables"))
         {
-            DatabaseFunctions.CreateAverageSimilarityArchIssuesAllEmails(4, "analysis_unique_pairs_arch_issues_all_emails", "unique_filtered_sim_arch_issues_all_emails");
+            DatabaseFunctions.CreateAverageSimilarityArchIssuesAllEmails(4, "iter4_cos_sim_filtered_arch_issues_all_emails", "iter4_sen_sim_filtered_arch_issues_all_emails");
         }
     }
 
@@ -173,7 +213,8 @@ internal class Program
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("insert old data to expanded table"))
         {
-            DatabaseFunctions.InsertInExpandedSimilarityTables();
+            DatabaseFunctions.InsertInExpandedSimilarityTables("sim_expanded_arch_emails_all_issues", "sim_result_arch_emails_all_issues", 0.35f);
+            DatabaseFunctions.InsertInExpandedSimilarityTables("sim_expanded_arch_issues_all_emails", "sim_result_arch_issues_all_emails", 0.35f);
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("fill in word count and creation time difference in expanded table"))
         {
@@ -181,7 +222,7 @@ internal class Program
             var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
             var listOfSimExpandedArchEmailsAllIssues = DatabaseFunctions.GetSimExpandedArchEmailsAllIssues(db);
             var listOfSimExpandedArchIssuesAllEmails = DatabaseFunctions.GetSimExpandedArchIssuesAllEmails(db);
-            SimExpandedTableLogic.RunMultiThreadedFillInAdditionalData(listOfEmails, listOfJiraIssues, listOfSimExpandedArchEmailsAllIssues, listOfSimExpandedArchIssuesAllEmails);
+            SimExpandedTableLogic.RunMultiThreadedFillInAdditionalData(listOfEmails, listOfJiraIssues, listOfSimExpandedArchEmailsAllIssues, listOfSimExpandedArchIssuesAllEmails, NumberOfThreads);
             DatabaseFunctions.SaveDatabase(db);
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("set smallest word count in sim expanded tables"))

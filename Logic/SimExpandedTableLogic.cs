@@ -14,15 +14,14 @@ namespace databaseEditor.Logic
         public static void RunMultiThreadedFillInAdditionalData(List<DataEmailEmail> listOfEmails,
                                                         List<DataJiraJiraIssue> listOfJiraIssues,
                                                         List<SimExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
-                                                        List<SimExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails)
+                                                        List<SimExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails,
+                                                        int threadCount)
         {
-            int numThreads = 10;
-
             // Divide the list sizes to determine the chunk size per thread
-            int chunkSizeArchEmailsAllIssues = listOfSimExpandedArchEmailsAllIssues.Count / numThreads;
-            int chunkSizeArchIssuesAllEmails = listOfSimExpandedArchIssuesAllEmails.Count / numThreads;
+            int chunkSizeArchEmailsAllIssues = listOfSimExpandedArchEmailsAllIssues.Count / threadCount;
+            int chunkSizeArchIssuesAllEmails = listOfSimExpandedArchIssuesAllEmails.Count / threadCount;
 
-            Parallel.ForEach(Partitioner.Create(0, numThreads), range =>
+            Parallel.ForEach(Partitioner.Create(0, threadCount), range =>
             {
                 // Get the range for the current thread
                 int startIndexArchEmailsAllIssues = range.Item1 * chunkSizeArchEmailsAllIssues;
@@ -37,7 +36,7 @@ namespace databaseEditor.Logic
             });
         }
 
-        public static void FillInAdditionalDataInExpandedTable(List<DataEmailEmail> listOfEmails,
+        private static void FillInAdditionalDataInExpandedTable(List<DataEmailEmail> listOfEmails,
                                                                List<DataJiraJiraIssue> listOfJiraIssues,
                                                                List<SimExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
                                                                List<SimExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails)

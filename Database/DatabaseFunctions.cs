@@ -5,6 +5,7 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -79,28 +80,39 @@ namespace databaseEditor.Database
         public static void ApplyWordCountFilterExportAsNewTable(string newTableName, string sourceTableName)
         {
             Console.Write($"Creating new table '{newTableName}'...");
-            ExecuteSQL($"CREATE TABLE IF NOT EXISTS {newTableName} AS " +
-                $"SELECT * FROM {sourceTableName} " +
-                $"WHERE smallest_word_count >= 50").Wait();
-            ExecuteSQL($"ALTER TABLE {newTableName}" +
-                $" ALTER COLUMN id SET NOT NULL," +
-                $" ALTER COLUMN email_id SET NOT NULL," +
-                $" ADD PRIMARY KEY (id)," +
-                $" ALTER COLUMN issue_key SET NOT NULL;").Wait();
+            var creationSql = $"""
+                CREATE TABLE IF NOT EXISTS {newTableName} AS 
+                SELECT * FROM {sourceTableName} 
+                WHERE smallest_word_count >= 50;
+                """;
+            ExecuteSQL(creationSql).Wait();
+            var alterSql = $"""
+                ALTER TABLE {newTableName} 
+                ALTER COLUMN email_id SET NOT NULL, 
+                ADD PRIMARY KEY (id), 
+                ALTER COLUMN issue_key SET NOT NULL;
+                """;
+            ExecuteSQL(alterSql).Wait();
             Console.Write($"\rCreated table '{newTableName}'.      \n");
         }
 
         public static void ApplyCreationTimeDifferenceFilterExportAsNewTable(string newTableName, string sourceTableName)
         {
             Console.Write($"Creating new table '{newTableName}'...");
-            ExecuteSQL($"CREATE TABLE IF NOT EXISTS {newTableName} AS " +
-                $"SELECT * FROM {sourceTableName} " +
-                $"WHERE creation_time_difference <= 500").Wait();
-            ExecuteSQL($"ALTER TABLE {newTableName}" +
-                $" ALTER COLUMN id SET NOT NULL," +
-                $" ALTER COLUMN email_id SET NOT NULL," +
-                $" ADD PRIMARY KEY (id)," +
-                $" ALTER COLUMN issue_key SET NOT NULL;").Wait();
+            var creationSql = $"""
+                CREATE TABLE IF NOT EXISTS {newTableName} AS 
+                SELECT * FROM {sourceTableName} 
+                WHERE creation_time_difference <= 500;
+                """;
+            ExecuteSQL(creationSql).Wait();
+            var alterSql = $"""
+                ALTER TABLE {newTableName} 
+                ALTER COLUMN id SET NOT NULL, 
+                ALTER COLUMN email_id SET NOT NULL, 
+                ADD PRIMARY KEY (id), 
+                ALTER COLUMN issue_key SET NOT NULL;
+                """;
+            ExecuteSQL(alterSql).Wait();
             Console.Write($"\rCreated table 'arch_emails_all_issues_word_and_creation_time_filtered'.      \n");
         }
 
@@ -130,6 +142,68 @@ namespace databaseEditor.Database
                 """).Wait();
             Console.Write($"\rCreated table '{newTableName}'.      \n");
         }
+
+        /// <summary>
+        /// Creates a new table with extra columns which are required for filtering
+        /// </summary>
+        /// <param name="newTableName">Name of the new table</param>
+        public static void CreateExpandedSimilarityTables(string newTableName)
+        {
+            Console.Write("Creating tables...");
+            List<String> createExpandedTablesSQL = new List<string>()
+                {
+                    $"CREATE SEQUENCE IF NOT EXISTS {newTableName}_id_seq AS integer;",
+
+                    $"CREATE TABLE IF NOT EXISTS {newTableName} " +
+                        $"(id integer default nextval('{newTableName}_id_seq'::regclass) not null primary key," +
+                        " email_id integer not null," +
+                        " issue_key text not null," +
+                        " similarity numeric," +
+                        " email_date timestamp," +
+                        " issue_created timestamp," +
+                        " email_word_count integer," +
+                        " issue_description_word_count integer," +
+                        " smallest_word_count integer," +
+                        " email_thread_id integer," +
+                        " issue_parent_key text," +
+                        " creation_time_difference integer);",
+                };
+            createExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
+            Console.Write("\rCreated tables.      \n");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sourceTableName">Name of the table which contains the data</param>
+        /// <param name="targetTableName">Name of the table in which the data gets insterted</param>
+        /// <param name="similarityThreshold">Get pairs with a similarity score above this threshold</param>
+        public static void InsertInExpandedSimilarityTables(string targetTableName, string sourceTableName, float similarityThreshold)
+        {
+            Console.Write("Inserting into tables...");
+            var fillInExpandedTablesSQL =
+                $"""
+                    INSERT INTO {targetTableName} (email_id, issue_key, similarity, email_date, email_thread_id, issue_created, issue_parent_key)
+                    SELECT
+                        s.email_id,
+                        s.issue_key,
+                        s.similarity,
+                        e.date,
+                        e.thread_id,
+                        j.created,
+                        j.parent_key
+                    FROM
+                        {sourceTableName} AS s
+                        JOIN data_email_email AS e ON s.email_id = e.id
+                        JOIN data_jira_jira_issue AS j ON s.issue_key = j.key
+                    WHERE
+                        s.similarity > {similarityThreshold.ToString(CultureInfo.InvariantCulture)};
+                    
+                    """;
+            ExecuteSQL(fillInExpandedTablesSQL).Wait(TimeSpan.FromSeconds(300));
+            Console.Write("\rInserted into tables.      \n");
+        }
+
 
         #endregion SharedFunctions
 
@@ -195,71 +269,6 @@ namespace databaseEditor.Database
 
         #endregion Iteration1Functions
 
-        #region ExpandingTablesFunctions
-
-        /// <summary>
-        /// Creates a new table with extra columns which are required for filtering
-        /// </summary>
-        /// <param name="newTableName">Name of the new table</param>
-        public static void CreateExpandedSimilarityTables(string newTableName)
-        {
-            Console.Write("Creating tables...");
-            List<String> createExpandedTablesSQL = new List<string>()
-                {
-                    $"CREATE SEQUENCE IF NOT EXISTS {newTableName}_id_seq AS integer;",
-
-                    $"CREATE TABLE IF NOT EXISTS {newTableName} " +
-                        $"(id integer default nextval('{newTableName}_id_seq'::regclass) not null primary key," +
-                        " email_id integer not null," +
-                        " issue_key text not null," +
-                        " similarity numeric," +
-                        " email_date timestamp," +
-                        " issue_created timestamp," +
-                        " email_word_count integer," +
-                        " issue_description_word_count integer," +
-                        " smallest_word_count integer," +
-                        " email_thread_id integer," +
-                        " issue_parent_key text," +
-                        " creation_time_difference integer);",
-                };
-            createExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
-            Console.Write("\rCreated tables.      \n");
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sourceTableName">Name of the table which contains the data</param>
-        /// <param name="targetTableName">Name of the table in which the data gets insterted</param>
-        /// <param name="similarityThreshold">Get pairs with a similarity score above this threshold</param>
-        public static void InsertInExpandedSimilarityTables(string targetTableName, string sourceTableName, float similarityThreshold)
-        {
-            Console.Write("Inserting into tables...");
-            var fillInExpandedTablesSQL =
-                $"""
-                    INSERT INTO {targetTableName} (email_id, issue_key, similarity, email_date, email_thread_id, issue_created, issue_parent_key)
-                    SELECT
-                        s.email_id,
-                        s.issue_key,
-                        s.similarity,
-                        e.date,
-                        e.thread_id,
-                        j.created,
-                        j.parent_key
-                    FROM
-                        {sourceTableName} AS s
-                        JOIN data_email_email AS e ON s.email_id = e.id
-                        JOIN data_jira_jira_issue AS j ON s.issue_key = j.key
-                    WHERE
-                        s.similarity > {similarityThreshold};
-                    
-                    """;
-            ExecuteSQL(fillInExpandedTablesSQL).Wait(TimeSpan.FromSeconds(300));
-            Console.Write("\rInserted into tables.      \n");
-        }
-
-        #endregion ExpandingTablesFunctions
-
         #region Iteration3Functions
 
         public static void CreateAverageSimilarityArchEmailsAllIssues(int iteration, string sourceTableCosineSimilarity, string sourceTableSentenceSimilarity)
@@ -287,7 +296,7 @@ namespace databaseEditor.Database
         public static void CreateAverageSimilarityArchIssuesAllEmails(int iteration, string sourceTableCosineSimilarity, string sourceTableSentenceSimilarity)
         {
             var sql = $"""
-                                CREATE TABLE iter{iteration}_average_similarity_arch_issues_all_emails AS
+                CREATE TABLE iter{iteration}_average_similarity_arch_issues_all_emails AS
                 SELECT
                     t1.id,
                     t1.email_id,
@@ -308,6 +317,41 @@ namespace databaseEditor.Database
         }
 
         #endregion Iteration3Functions
+
+        #region Iteration4Functions
+
+        public static void CreateFilteredArchIssuesAllEmails(string sourceTableName, string newTableName)
+        {
+            var sql = $"""
+                BEGIN TRANSACTION;
+
+                CREATE TABLE IF NOT EXISTS {newTableName} AS
+                    SELECT t.id, t.email_id, t.issue_key, t.similarity, t.smallest_word_count, t.creation_time_difference, t.email_thread_id, t.issue_parent_key
+                    FROM (
+                        SELECT email_thread_id, issue_parent_key, MAX(similarity) AS max_similarity
+                        FROM {sourceTableName}
+                        WHERE smallest_word_count >= 50
+                        GROUP BY email_thread_id, issue_parent_key
+                    ) AS subq
+                    JOIN {sourceTableName} AS t
+                    ON t.email_thread_id = subq.email_thread_id
+                    AND t.issue_parent_key = subq.issue_parent_key
+                    AND t.similarity = subq.max_similarity
+                    WHERE t.creation_time_difference <= 500
+                    ORDER BY t.similarity DESC;
+
+                ALTER TABLE {newTableName}
+                    ALTER COLUMN id SET NOT NULL,
+                    ALTER COLUMN email_id SET NOT NULL,
+                    ALTER COLUMN issue_key SET NOT NULL,
+                    ADD PRIMARY KEY (id);
+
+                COMMIT;
+                """;
+            ExecuteSQL(sql).Wait(TimeSpan.FromSeconds(600));
+        }
+
+        #endregion Iteration4Functions
 
         #region GetTables
         public static List<DataEmailEmail> GetEmails(RelationsDbContext dbContext)
@@ -387,6 +431,22 @@ namespace databaseEditor.Database
             Console.Write("Loading sim_expanded_arch_issues_all_emails table...");
             var listToReturn = dbContext.SimExpandedArchIssuesAllEmails.ToList();
             Console.Write("\rLoaded sim_expanded_arch_issues_all_emails table.      \n");
+            return listToReturn;
+        }
+
+        public static List<Iter4SenSimExpandedArchIssuesAllEmail> GetIter4SenSimExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading iter4_sen_sim_expanded_arch_issues_all_emails table...");
+            var listToReturn = dbContext.Iter4SenSimExpandedArchIssuesAllEmails.ToList();
+            Console.Write("\rLoaded iter4_sen_sim_expanded_arch_issues_all_emails table.      \n");
+            return listToReturn;
+        }
+
+        public static List<Iter4CosSimExpandedArchIssuesAllEmail> GetIter4CosSimExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
+        {
+            Console.Write("Loading iter4_cos_sim_expanded_arch_issues_all_emails table...");
+            var listToReturn = dbContext.Iter4CosSimExpandedArchIssuesAllEmails.ToList();
+            Console.Write("\rLoaded iter4_cos_sim_expanded_arch_issues_all_emails table.      \n");
             return listToReturn;
         }
 

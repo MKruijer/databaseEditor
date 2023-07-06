@@ -32,6 +32,10 @@ public partial class DataJiraJiraIssue
 
     public virtual ICollection<DataJiraJiraIssueComment> DataJiraJiraIssueComments { get; set; } = new List<DataJiraJiraIssueComment>();
 
+    public virtual ICollection<Iter4CosSimResultArchIssuesAllEmail> Iter4CosSimResultArchIssuesAllEmails { get; set; } = new List<Iter4CosSimResultArchIssuesAllEmail>();
+
+    public virtual ICollection<Iter4SenSimResultArchIssuesAllEmail> Iter4SenSimResultArchIssuesAllEmails { get; set; } = new List<Iter4SenSimResultArchIssuesAllEmail>();
+
     public virtual ICollection<ResultArchEmailsAllIssue> ResultArchEmailsAllIssues { get; set; } = new List<ResultArchEmailsAllIssue>();
 
     public virtual ICollection<ResultArchIssuesAllEmail> ResultArchIssuesAllEmails { get; set; } = new List<ResultArchIssuesAllEmail>();
