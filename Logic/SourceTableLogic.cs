@@ -49,10 +49,6 @@ namespace databaseEditor.Logic
                 foreach (var entry in entries)
                 {
                     var key = entry.Key;
-                    if(key == "CASSANDRA-18223")
-                    {
-                        Thread.Sleep(50);
-                    }
                     var isExistence = entry.Value.label.existence;
                     var isProperty = entry.Value.label.property;
                     var isExecutive = entry.Value.label.executive;
