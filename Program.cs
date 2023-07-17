@@ -78,20 +78,13 @@ internal class Program
             DatabaseFunctions.InsertInExpandedSimilarityTables("iter4_sen_sim_expanded_arch_issues_all_emails", "iter4_sen_sim_result_arch_issues_all_emails", 0.35f);
             DatabaseFunctions.InsertInExpandedSimilarityTables("iter4_cos_sim_expanded_arch_issues_all_emails", "iter4_cos_sim_result_arch_issues_all_emails", 0.1f);
         }
-        if (UIFunctions.CheckIfUserWantsToTakeAction("fill in word count and creation time difference in expanded table"))
+        if (UIFunctions.CheckIfUserWantsToTakeAction("fill in creation time difference in expanded table"))
         {
-            var listOfEmails = DatabaseFunctions.GetEmails(db);
-            var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
             var listOfIter4SenSimExpandedArchIssuesAllEmails = DatabaseFunctions.GetIter4SenSimExpandedArchIssuesAllEmails(db);
             var listOfIter4CosSimExpandedArchIssuesAllEmails = DatabaseFunctions.GetIter4CosSimExpandedArchIssuesAllEmails(db);
-            Iter4Logic.RunMultiThreadedFillInAdditionalData(listOfEmails, listOfJiraIssues, listOfIter4SenSimExpandedArchIssuesAllEmails, NumberOfThreads);
-            Iter4Logic.RunMultiThreadedFillInAdditionalData(listOfEmails, listOfJiraIssues, listOfIter4CosSimExpandedArchIssuesAllEmails, NumberOfThreads);
+            Iter4Logic.RunMultiThreadedFillInCreationTimeDifference(listOfIter4SenSimExpandedArchIssuesAllEmails, NumberOfThreads);
+            Iter4Logic.RunMultiThreadedFillInCreationTimeDifference(listOfIter4CosSimExpandedArchIssuesAllEmails, NumberOfThreads);
             DatabaseFunctions.SaveDatabase(db);
-        }
-        if (UIFunctions.CheckIfUserWantsToTakeAction("set smallest word count in sim expanded tables"))
-        {
-            DatabaseFunctions.SetSmallestWordCount("iter4_sen_sim_expanded_arch_issues_all_emails");
-            DatabaseFunctions.SetSmallestWordCount("iter4_cos_sim_expanded_arch_issues_all_emails");
         }
     }
 
@@ -173,7 +166,8 @@ internal class Program
     {
         if (UIFunctions.CheckIfUserWantsToTakeAction("create expanded tables"))
         {
-            DatabaseFunctions.CreateExpandedTables();
+            DatabaseFunctions.CreateExpandedSimilarityTables("iter1_expanded_arch_issues_all_emails");
+            DatabaseFunctions.CreateExpandedSimilarityTables("iter1_expanded_arch_emails_all_issues");
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("insert old data to expanded table"))
         {
@@ -208,27 +202,20 @@ internal class Program
     {
         if (UIFunctions.CheckIfUserWantsToTakeAction("create sim-expanded tables"))
         {
-            DatabaseFunctions.CreateExpandedSimilarityTables("sim_expanded_arch_issues_all_emails");
-            DatabaseFunctions.CreateExpandedSimilarityTables("sim_expanded_arch_emails_all_issues");
+            DatabaseFunctions.CreateExpandedSimilarityTables("iter2_sim_expanded_arch_issues_all_emails");
+            DatabaseFunctions.CreateExpandedSimilarityTables("iter2_sim_expanded_arch_emails_all_issues");
         }
-        if (UIFunctions.CheckIfUserWantsToTakeAction("insert old data to expanded table"))
+        if (UIFunctions.CheckIfUserWantsToTakeAction("insert source data to expanded table"))
         {
-            DatabaseFunctions.InsertInExpandedSimilarityTables("sim_expanded_arch_emails_all_issues", "sim_result_arch_emails_all_issues", 0.35f);
-            DatabaseFunctions.InsertInExpandedSimilarityTables("sim_expanded_arch_issues_all_emails", "sim_result_arch_issues_all_emails", 0.35f);
+            DatabaseFunctions.InsertInExpandedSimilarityTables("iter2_sim_expanded_arch_emails_all_issues", "sim_result_arch_emails_all_issues", 0.35f);
+            DatabaseFunctions.InsertInExpandedSimilarityTables("iter2_sim_expanded_arch_issues_all_emails", "sim_result_arch_issues_all_emails", 0.35f);
         }
-        if (UIFunctions.CheckIfUserWantsToTakeAction("fill in word count and creation time difference in expanded table"))
+        if (UIFunctions.CheckIfUserWantsToTakeAction("fill in creation time difference in expanded table"))
         {
-            var listOfEmails = DatabaseFunctions.GetEmails(db);
-            var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
             var listOfSimExpandedArchEmailsAllIssues = DatabaseFunctions.GetSimExpandedArchEmailsAllIssues(db);
             var listOfSimExpandedArchIssuesAllEmails = DatabaseFunctions.GetSimExpandedArchIssuesAllEmails(db);
-            SimExpandedTableLogic.RunMultiThreadedFillInAdditionalData(listOfEmails, listOfJiraIssues, listOfSimExpandedArchEmailsAllIssues, listOfSimExpandedArchIssuesAllEmails, NumberOfThreads);
+            SimExpandedTableLogic.RunMultiThreadedFillInCreationTimeDifference(listOfSimExpandedArchEmailsAllIssues, listOfSimExpandedArchIssuesAllEmails, NumberOfThreads);
             DatabaseFunctions.SaveDatabase(db);
-        }
-        if (UIFunctions.CheckIfUserWantsToTakeAction("set smallest word count in sim expanded tables"))
-        {
-            DatabaseFunctions.SetSmallestWordCount("sim_expanded_arch_emails_all_issues");
-            DatabaseFunctions.SetSmallestWordCount("sim_expanded_arch_issues_all_emails");
         }
     }
 
@@ -236,64 +223,20 @@ internal class Program
     {
         if (UIFunctions.CheckIfUserWantsToTakeAction("apply word limit filter (remove entries with less than 50 words) and export as new table"))
         {
-            DatabaseFunctions.ApplyWordCountFilterExportAsNewTable("sim_arch_emails_all_issues_word_filtered", "sim_expanded_arch_emails_all_issues");
-            DatabaseFunctions.ApplyWordCountFilterExportAsNewTable("sim_arch_issues_all_emails_word_filtered", "sim_expanded_arch_issues_all_emails");
+            DatabaseFunctions.ApplyWordCountFilterExportAsNewTable("iter2_sim_arch_emails_all_issues_word_filtered", "iter2_sim_expanded_arch_emails_all_issues");
+            DatabaseFunctions.ApplyWordCountFilterExportAsNewTable("iter2_sim_arch_issues_all_emails_word_filtered", "iter2_sim_expanded_arch_issues_all_emails");
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("apply creation time difference filter (remove entries with a creation time difference greater than 500 days) and export as new table"))
         {
-            DatabaseFunctions.ApplyCreationTimeDifferenceFilterExportAsNewTable("sim_arch_emails_all_issues_word_and_creation_time_filtered", "sim_arch_emails_all_issues_word_filtered");
-            DatabaseFunctions.ApplyCreationTimeDifferenceFilterExportAsNewTable("sim_arch_issues_all_emails_word_and_creation_time_filtered", "sim_arch_issues_all_emails_word_filtered");
-        }
-        if (UIFunctions.CheckIfUserWantsToTakeAction("Update top500 pairs to have a Jira issue parent in max word and creation time filtered tables"))
-        {
-            UpdateTop500Pairs(db, DatabaseFunctions.GetSimMaxFilteredArchEmailAllIssue(db)
-                                                   .OrderByDescending(pair => pair.Similarity)
-                                                   .ToList()
-                                                   .Take(500)
-                                                   .ToList()
-                                                   .Where(pair => pair.IssueParentKey == null)
-                                                   .ToList());
-            UpdateTop500Pairs(db, DatabaseFunctions.GetSimMaxFilteredArchIssueAllEmail(db)
-                                                   .OrderByDescending(pair => pair.Similarity)
-                                                   .ToList()
-                                                   .Take(500)
-                                                   .ToList()
-                                                   .Where(pair => pair.IssueParentKey == null)
-                                                   .ToList());
+            DatabaseFunctions.ApplyCreationTimeDifferenceFilterExportAsNewTable("iter2_sim_arch_emails_all_issues_word_and_creation_time_filtered", "iter2_sim_arch_emails_all_issues_word_filtered");
+            DatabaseFunctions.ApplyCreationTimeDifferenceFilterExportAsNewTable("iter2_sim_arch_issues_all_emails_word_and_creation_time_filtered", "iter2_sim_arch_issues_all_emails_word_filtered");
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("apply duplication filter and export as new tables"))
         {
-            DatabaseFunctions.ApplyDuplicationFilterExportAsNewTable("unique_filtered_sim_arch_emails_all_issues", "sim_arch_emails_all_issues_word_and_creation_time_filtered");
-            DatabaseFunctions.ApplyDuplicationFilterExportAsNewTable("unique_filtered_sim_arch_issues_all_emails", "sim_arch_issues_all_emails_word_and_creation_time_filtered");
+            DatabaseFunctions.ApplyDuplicationFilterExportAsNewTable("iter2_unique_filtered_sim_arch_emails_all_issues", "iter2_sim_arch_emails_all_issues_word_and_creation_time_filtered");
+            DatabaseFunctions.ApplyDuplicationFilterExportAsNewTable("iter2_unique_filtered_sim_arch_issues_all_emails", "iter2_sim_arch_issues_all_emails_word_and_creation_time_filtered");
         }
     }
-
-    private static void UpdateTop500Pairs(RelationsDbContext db, List<SimArchEmailsAllIssuesWordAndCreationTimeFiltered> listOfFilteredPairs)
-    {
-        var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
-        List<string> jiraKeyList = new List<string>();
-        listOfFilteredPairs.ForEach(pair => jiraKeyList.Add(pair.IssueKey));
-        var dictionary = JiraApiFunctions.GetParentDictionaryFromJiraIssues(jiraKeyList);
-        listOfFilteredPairs.ForEach(pair =>
-        {
-            pair.IssueParentKey = dictionary[pair.IssueKey].ParentIssueKey ?? pair.IssueKey;
-        });
-        DatabaseFunctions.SaveDatabase(db);
-    }
-
-    private static void UpdateTop500Pairs(RelationsDbContext db, List<SimArchIssuesAllEmailsWordAndCreationTimeFiltered> listOfFilteredPairs)
-    {
-        var listOfJiraIssues = DatabaseFunctions.GetJiraIssues(db);
-        List<string> jiraKeyList = new List<string>();
-        listOfFilteredPairs.ForEach(pair => jiraKeyList.Add(pair.IssueKey));
-        var dictionary = JiraApiFunctions.GetParentDictionaryFromJiraIssues(jiraKeyList);
-        listOfFilteredPairs.ForEach(pair =>
-        {
-            pair.IssueParentKey = dictionary[pair.IssueKey].ParentIssueKey ?? pair.IssueKey;
-        });
-        DatabaseFunctions.SaveDatabase(db);
-    }
-
     private static void DoJiraIssueParentFunctions(RelationsDbContext db)
     {
         if (UIFunctions.CheckIfUserWantsToTakeAction("fill in Jira issue parent key data in max filtered ArchEmailAllIssue tables"))

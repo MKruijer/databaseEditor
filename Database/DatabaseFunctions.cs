@@ -183,14 +183,17 @@ namespace databaseEditor.Database
             Console.Write("Inserting into tables...");
             var fillInExpandedTablesSQL =
                 $"""
-                    INSERT INTO {targetTableName} (email_id, issue_key, similarity, email_date, email_thread_id, issue_created, issue_parent_key)
+                    INSERT INTO {targetTableName} (email_id, issue_key, similarity, email_date, issue_created, email_word_count, issue_description_word_count, smallest_word_count, email_thread_id, issue_parent_key)
                     SELECT
                         s.email_id,
                         s.issue_key,
                         s.similarity,
                         e.date,
-                        e.thread_id,
                         j.created,
+                        e.word_count,
+                        j.description_word_count,
+                        LEAST(j.issue_description_word_count, e.email_word_count)
+                        e.thread_id,
                         j.parent_key
                     FROM
                         {sourceTableName} AS s
@@ -208,49 +211,6 @@ namespace databaseEditor.Database
         #endregion SharedFunctions
 
         #region Iteration1Functions
-
-        public static void CreateExpandedTables()
-        {
-            Console.Write("Creating tables...");
-            List<String> createExpandedTablesSQL = new List<string>()
-                {
-                    "CREATE SEQUENCE IF NOT EXISTS expanded_arch_issues_all_emails_id_seq AS integer;",
-
-                    "CREATE SEQUENCE IF NOT EXISTS expanded_arch_emails_all_issues_id_seq AS integer;",
-
-                    "CREATE TABLE IF NOT EXISTS expanded_arch_issues_all_emails " +
-                        "(id integer default nextval('expanded_arch_issues_all_emails_id_seq'::regclass) not null primary key," +
-                        " email_id integer not null," +
-                        " issue_key text not null," +
-                        " similarity numeric," +
-                        " email_date timestamp," +
-                        " issue_created timestamp," +
-                        " issue_modified timestamp," +
-                        " email_word_count integer," +
-                        " issue_description_word_count integer," +
-                        " smallest_word_count integer," +
-                        " email_thread_id integer," +
-                        " issue_parent_key text," +
-                        " creation_time_difference integer);",
-
-                    "CREATE TABLE IF NOT EXISTS expanded_arch_emails_all_issues" +
-                    "(id integer default nextval('expanded_arch_emails_all_issues_id_seq'::regclass) not null primary key," +
-                        " email_id integer not null," +
-                        " issue_key text not null," +
-                        " similarity numeric," +
-                        " email_date timestamp," +
-                        " issue_created timestamp," +
-                        " issue_modified timestamp," +
-                        " email_word_count integer," +
-                        " issue_description_word_count integer," +
-                        " smallest_word_count integer," +
-                        " email_thread_id integer," +
-                        " issue_parent_key text," +
-                        " creation_time_difference integer);"
-                };
-            createExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
-            Console.Write("\rCreated tables.      \n");
-        }
 
         public static void InsertInExpandedTables()
         {
@@ -274,7 +234,7 @@ namespace databaseEditor.Database
         public static void CreateAverageSimilarityArchEmailsAllIssues(int iteration, string sourceTableCosineSimilarity, string sourceTableSentenceSimilarity)
         {
             var sql = $"""
-                                CREATE TABLE iter{iteration}_average_similarity_arch_emails_all_issues AS
+                CREATE TABLE iter{iteration}_average_similarity_arch_emails_all_issues AS
                 SELECT
                     t1.id,
                     t1.email_id,

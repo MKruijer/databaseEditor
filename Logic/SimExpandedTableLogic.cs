@@ -11,9 +11,7 @@ namespace databaseEditor.Logic
 {
     public static class SimExpandedTableLogic
     {
-        public static void RunMultiThreadedFillInAdditionalData(List<DataEmailEmail> listOfEmails,
-                                                        List<DataJiraJiraIssue> listOfJiraIssues,
-                                                        List<SimExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
+        public static void RunMultiThreadedFillInCreationTimeDifference(List<SimExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
                                                         List<SimExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails,
                                                         int threadCount)
         {
@@ -30,89 +28,9 @@ namespace databaseEditor.Logic
                 int endIndexArchIssuesAllEmails = range.Item2 * chunkSizeArchIssuesAllEmails;
 
                 // Run the function with the subset of pairs
-                FillInAdditionalDataInExpandedTable(listOfEmails, listOfJiraIssues,
-                                                    listOfSimExpandedArchEmailsAllIssues.GetRange(startIndexArchEmailsAllIssues, endIndexArchEmailsAllIssues - startIndexArchEmailsAllIssues),
-                                                    listOfSimExpandedArchIssuesAllEmails.GetRange(startIndexArchIssuesAllEmails, endIndexArchIssuesAllEmails - startIndexArchIssuesAllEmails));
+                FillInCreationTimeDifference(listOfSimExpandedArchEmailsAllIssues.GetRange(startIndexArchEmailsAllIssues, endIndexArchEmailsAllIssues - startIndexArchEmailsAllIssues));
+                FillInCreationTimeDifference(listOfSimExpandedArchIssuesAllEmails.GetRange(startIndexArchIssuesAllEmails, endIndexArchIssuesAllEmails - startIndexArchIssuesAllEmails));
             });
-        }
-
-        private static void FillInAdditionalDataInExpandedTable(List<DataEmailEmail> listOfEmails,
-                                                               List<DataJiraJiraIssue> listOfJiraIssues,
-                                                               List<SimExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
-                                                               List<SimExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails)
-        {
-            FillInEmailWordCount(listOfSimExpandedArchEmailsAllIssues, listOfEmails);
-            FillInEmailWordCount(listOfSimExpandedArchIssuesAllEmails, listOfEmails);
-
-            FillInIssueWordCount(listOfSimExpandedArchEmailsAllIssues, listOfJiraIssues);
-            FillInIssueWordCount(listOfSimExpandedArchIssuesAllEmails, listOfJiraIssues);
-
-            FillInCreationTimeDifference(listOfSimExpandedArchEmailsAllIssues);
-            FillInCreationTimeDifference(listOfSimExpandedArchIssuesAllEmails);
-        }
-
-        private static void FillInEmailWordCount(List<SimExpandedArchEmailsAllIssue> simExpandedArchEmailsAllIssuesPairs,
-                                               List<DataEmailEmail> listOfEmails)
-        {
-            var totalAmountOfPairs = simExpandedArchEmailsAllIssuesPairs.Count();
-            int currentAmountOfPairsDone = 0;
-            Console.WriteLine("Starting filling in email word count in sim_expanded_arch_emails_all_issues...");
-            foreach (var pair in simExpandedArchEmailsAllIssuesPairs)
-            {
-                var email = listOfEmails.Where(e => e.Id == pair.EmailId).FirstOrDefault();
-                pair.EmailWordCount = email?.WordCount;
-                UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
-            }
-            Console.Write("\rFilling in email word count in sim_expanded_arch_emails_all_issues completed.\n");
-            Console.WriteLine();
-        }
-
-        private static void FillInEmailWordCount(List<SimExpandedArchIssuesAllEmail> simExpandedArchIssuesAllEmailsPairs,
-                                               List<DataEmailEmail> listOfEmails)
-        {
-            var totalAmountOfPairs = simExpandedArchIssuesAllEmailsPairs.Count();
-            int currentAmountOfPairsDone = 0;
-            Console.WriteLine("Starting filling in email word count in sim_expanded_arch_issues_all_emails...");
-            foreach (var pair in simExpandedArchIssuesAllEmailsPairs)
-            {
-                var email = listOfEmails.Where(e => e.Id == pair.EmailId).FirstOrDefault();
-                pair.EmailWordCount = email?.WordCount;
-                UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
-            }
-            Console.Write("\rFilling in email word count in sim_expanded_arch_issues_all_emails completed.\n");
-            Console.WriteLine();
-        }
-
-        private static void FillInIssueWordCount(List<SimExpandedArchEmailsAllIssue> simExpandedArchEmailsAllIssuesPairs,
-                                                                    List<DataJiraJiraIssue> listOfJiraIssues)
-        {
-            var totalAmountOfPairs = simExpandedArchEmailsAllIssuesPairs.Count();
-            int currentAmountOfPairsDone = 0;
-            Console.WriteLine("Starting filling in issue word count in sim_expanded_arch_emails_all_issues...");
-            foreach (var pair in simExpandedArchEmailsAllIssuesPairs)
-            {
-                var issue = listOfJiraIssues.Where(i => i.Key == pair.IssueKey).FirstOrDefault();
-                pair.IssueDescriptionWordCount = issue?.DescriptionWordCount;
-                UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
-            }
-            Console.Write("\rFilling in issue word count in sim_expanded_arch_emails_all_issues completed.\n");
-            Console.WriteLine();
-        }
-
-        private static void FillInIssueWordCount(List<SimExpandedArchIssuesAllEmail> simExpandedArchIssuesAllEmailsPairs,
-                                                                    List<DataJiraJiraIssue> listOfJiraIssues)
-        {
-            var totalAmountOfPairs = simExpandedArchIssuesAllEmailsPairs.Count();
-            int currentAmountOfPairsDone = 0;
-            Console.WriteLine("Starting filling in issue data in sim_expanded_arch_issues_all_emails...");
-            foreach (var pair in simExpandedArchIssuesAllEmailsPairs)
-            {
-                var issue = listOfJiraIssues.Where(i => i.Key == pair.IssueKey).FirstOrDefault();
-                pair.IssueDescriptionWordCount = issue?.DescriptionWordCount;
-                UIFunctions.PrintStatusUpdate(++currentAmountOfPairsDone, totalAmountOfPairs);
-            }
-            Console.Write("\rFilling in issue data in sim_expanded_arch_issues_all_emails completed.\n");
-            Console.WriteLine();
         }
 
         private static void FillInCreationTimeDifference(List<SimExpandedArchEmailsAllIssue> simExpandedArchEmailsAllIssuesPairs)
