@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace databaseEditor.Logic
 {
-    public static class SimExpandedTableLogic
+    public static class Iter2Logic
     {
-        public static void RunMultiThreadedFillInCreationTimeDifference(List<SimExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
-                                                        List<SimExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails,
+        public static void RunMultiThreadedFillInCreationTimeDifference(List<Iter2SimExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
+                                                        List<Iter2SimExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails,
                                                         int threadCount)
         {
             // Divide the list sizes to determine the chunk size per thread
@@ -33,7 +33,7 @@ namespace databaseEditor.Logic
             });
         }
 
-        private static void FillInCreationTimeDifference(List<SimExpandedArchEmailsAllIssue> simExpandedArchEmailsAllIssuesPairs)
+        private static void FillInCreationTimeDifference(List<Iter2SimExpandedArchEmailsAllIssue> simExpandedArchEmailsAllIssuesPairs)
         {
             var totalAmountOfPairs = simExpandedArchEmailsAllIssuesPairs.Count();
             int currentAmountOfPairsDone = 0;
@@ -57,7 +57,7 @@ namespace databaseEditor.Logic
             Console.WriteLine();
         }
 
-        private static void FillInCreationTimeDifference(List<SimExpandedArchIssuesAllEmail> simExpandedArchIssuesAllEmailsPairs)
+        private static void FillInCreationTimeDifference(List<Iter2SimExpandedArchIssuesAllEmail> simExpandedArchIssuesAllEmailsPairs)
         {
             var totalAmountOfPairs = simExpandedArchIssuesAllEmailsPairs.Count();
             int currentAmountOfPairsDone = 0;

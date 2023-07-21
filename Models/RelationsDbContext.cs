@@ -15,22 +15,6 @@ public partial class RelationsDbContext : DbContext
     {
     }
 
-    public virtual DbSet<AnalysisUniquePairsArchEmailsAllIssue> AnalysisUniquePairsArchEmailsAllIssues { get; set; }
-
-    public virtual DbSet<AnalysisUniquePairsArchIssuesAllEmail> AnalysisUniquePairsArchIssuesAllEmails { get; set; }
-
-    public virtual DbSet<ArchEmailsAllIssuesWordAndCreationTimeFiltered> ArchEmailsAllIssuesWordAndCreationTimeFiltereds { get; set; }
-
-    public virtual DbSet<ArchEmailsAllIssuesWordFiltered> ArchEmailsAllIssuesWordFiltereds { get; set; }
-
-    public virtual DbSet<ArchIssuesAllEmailsWordAndCreationTimeFiltered> ArchIssuesAllEmailsWordAndCreationTimeFiltereds { get; set; }
-
-    public virtual DbSet<ArchIssuesAllEmailsWordFiltered> ArchIssuesAllEmailsWordFiltereds { get; set; }
-
-    public virtual DbSet<AverageSimilarityArchEmailsAllIssue> AverageSimilarityArchEmailsAllIssues { get; set; }
-
-    public virtual DbSet<AverageSimilarityArchIssuesAllEmail> AverageSimilarityArchIssuesAllEmails { get; set; }
-
     public virtual DbSet<DataEmailEmail> DataEmailEmails { get; set; }
 
     public virtual DbSet<DataEmailTag> DataEmailTags { get; set; }
@@ -39,45 +23,47 @@ public partial class RelationsDbContext : DbContext
 
     public virtual DbSet<DataJiraJiraIssueComment> DataJiraJiraIssueComments { get; set; }
 
-    public virtual DbSet<ExpandedArchEmailsAllIssue> ExpandedArchEmailsAllIssues { get; set; }
+    public virtual DbSet<Iter1AnalysisUniquePairsArchEmailsAllIssue> Iter1AnalysisUniquePairsArchEmailsAllIssues { get; set; }
 
-    public virtual DbSet<ExpandedArchIssuesAllEmail> ExpandedArchIssuesAllEmails { get; set; }
+    public virtual DbSet<Iter1AnalysisUniquePairsArchIssuesAllEmail> Iter1AnalysisUniquePairsArchIssuesAllEmails { get; set; }
+
+    public virtual DbSet<Iter1ExpandedArchEmailsAllIssue> Iter1ExpandedArchEmailsAllIssues { get; set; }
+
+    public virtual DbSet<Iter1ExpandedArchIssuesAllEmail> Iter1ExpandedArchIssuesAllEmails { get; set; }
+
+    public virtual DbSet<Iter2SimExpandedArchEmailsAllIssue> Iter2SimExpandedArchEmailsAllIssues { get; set; }
+
+    public virtual DbSet<Iter2SimExpandedArchIssuesAllEmail> Iter2SimExpandedArchIssuesAllEmails { get; set; }
+
+    public virtual DbSet<Iter2UniqueFilteredSimArchEmailsAllIssue> Iter2UniqueFilteredSimArchEmailsAllIssues { get; set; }
+
+    public virtual DbSet<Iter2UniqueFilteredSimArchIssuesAllEmail> Iter2UniqueFilteredSimArchIssuesAllEmails { get; set; }
+
+    public virtual DbSet<Iter3AverageSimilarityArchEmailsAllIssue> Iter3AverageSimilarityArchEmailsAllIssues { get; set; }
+
+    public virtual DbSet<Iter3AverageSimilarityArchIssuesAllEmail> Iter3AverageSimilarityArchIssuesAllEmails { get; set; }
+
+    public virtual DbSet<Iter4AverageSimilarityArchIssuesAllEmail> Iter4AverageSimilarityArchIssuesAllEmails { get; set; }
 
     public virtual DbSet<Iter4CosSimExpandedArchIssuesAllEmail> Iter4CosSimExpandedArchIssuesAllEmails { get; set; }
+
+    public virtual DbSet<Iter4CosSimFilteredArchIssuesAllEmail> Iter4CosSimFilteredArchIssuesAllEmails { get; set; }
 
     public virtual DbSet<Iter4CosSimResultArchIssuesAllEmail> Iter4CosSimResultArchIssuesAllEmails { get; set; }
 
     public virtual DbSet<Iter4SenSimExpandedArchIssuesAllEmail> Iter4SenSimExpandedArchIssuesAllEmails { get; set; }
 
+    public virtual DbSet<Iter4SenSimFilteredArchIssuesAllEmail> Iter4SenSimFilteredArchIssuesAllEmails { get; set; }
+
     public virtual DbSet<Iter4SenSimResultArchIssuesAllEmail> Iter4SenSimResultArchIssuesAllEmails { get; set; }
-
-    public virtual DbSet<ModifiedArchEmailsAllIssue> ModifiedArchEmailsAllIssues { get; set; }
-
-    public virtual DbSet<ModifiedArchIssuesAllEmail> ModifiedArchIssuesAllEmails { get; set; }
 
     public virtual DbSet<ResultArchEmailsAllIssue> ResultArchEmailsAllIssues { get; set; }
 
     public virtual DbSet<ResultArchIssuesAllEmail> ResultArchIssuesAllEmails { get; set; }
 
-    public virtual DbSet<SimArchEmailsAllIssuesWordAndCreationTimeFiltered> SimArchEmailsAllIssuesWordAndCreationTimeFiltereds { get; set; }
-
-    public virtual DbSet<SimArchEmailsAllIssuesWordFiltered> SimArchEmailsAllIssuesWordFiltereds { get; set; }
-
-    public virtual DbSet<SimArchIssuesAllEmailsWordAndCreationTimeFiltered> SimArchIssuesAllEmailsWordAndCreationTimeFiltereds { get; set; }
-
-    public virtual DbSet<SimArchIssuesAllEmailsWordFiltered> SimArchIssuesAllEmailsWordFiltereds { get; set; }
-
-    public virtual DbSet<SimExpandedArchEmailsAllIssue> SimExpandedArchEmailsAllIssues { get; set; }
-
-    public virtual DbSet<SimExpandedArchIssuesAllEmail> SimExpandedArchIssuesAllEmails { get; set; }
-
     public virtual DbSet<SimResultArchEmailsAllIssue> SimResultArchEmailsAllIssues { get; set; }
 
     public virtual DbSet<SimResultArchIssuesAllEmail> SimResultArchIssuesAllEmails { get; set; }
-
-    public virtual DbSet<UniqueFilteredSimArchEmailsAllIssue> UniqueFilteredSimArchEmailsAllIssues { get; set; }
-
-    public virtual DbSet<UniqueFilteredSimArchIssuesAllEmail> UniqueFilteredSimArchIssuesAllEmails { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -86,194 +72,6 @@ public partial class RelationsDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("tablefunc");
-
-        modelBuilder.Entity<AnalysisUniquePairsArchEmailsAllIssue>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("analysis_unique_pairs_arch_emails_all_issues");
-
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCountas).HasColumnName("smallest_word_countas");
-        });
-
-        modelBuilder.Entity<AnalysisUniquePairsArchIssuesAllEmail>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("analysis_unique_pairs_arch_issues_all_emails");
-
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCountas).HasColumnName("smallest_word_countas");
-        });
-
-        modelBuilder.Entity<ArchEmailsAllIssuesWordAndCreationTimeFiltered>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("arch_emails_all_issues_word_and_creation_time_filtered_pkey");
-
-            entity.ToTable("arch_emails_all_issues_word_and_creation_time_filtered");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueModified)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_modified");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<ArchEmailsAllIssuesWordFiltered>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("arch_emails_all_issues_word_filtered_pkey");
-
-            entity.ToTable("arch_emails_all_issues_word_filtered");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueModified)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_modified");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<ArchIssuesAllEmailsWordAndCreationTimeFiltered>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("arch_issues_all_emails_word_and_creation_time_filtered_pkey");
-
-            entity.ToTable("arch_issues_all_emails_word_and_creation_time_filtered");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueModified)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_modified");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<ArchIssuesAllEmailsWordFiltered>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("arch_issues_all_emails_word_filtered_pkey");
-
-            entity.ToTable("arch_issues_all_emails_word_filtered");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueModified)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_modified");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<AverageSimilarityArchEmailsAllIssue>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("average_similarity_arch_emails_all_issues");
-
-            entity.Property(e => e.AverageSimilarity).HasColumnName("average_similarity");
-            entity.Property(e => e.CosineSimilarity).HasColumnName("cosine_similarity");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.SentenceSimilarity).HasColumnName("sentence_similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<AverageSimilarityArchIssuesAllEmail>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("average_similarity_arch_issues_all_emails");
-
-            entity.Property(e => e.AverageSimilarity).HasColumnName("average_similarity");
-            entity.Property(e => e.CosineSimilarity).HasColumnName("cosine_similarity");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.SentenceSimilarity).HasColumnName("sentence_similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
 
         modelBuilder.Entity<DataEmailEmail>(entity =>
         {
@@ -375,13 +173,51 @@ public partial class RelationsDbContext : DbContext
                 .HasConstraintName("jira_issue_comment_issue_key_fkey");
         });
 
-        modelBuilder.Entity<ExpandedArchEmailsAllIssue>(entity =>
+        modelBuilder.Entity<Iter1AnalysisUniquePairsArchEmailsAllIssue>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("iter1_analysis_unique_pairs_arch_emails_all_issues");
+
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCountas).HasColumnName("smallest_word_countas");
+        });
+
+        modelBuilder.Entity<Iter1AnalysisUniquePairsArchIssuesAllEmail>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("iter1_analysis_unique_pairs_arch_issues_all_emails");
+
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCountas).HasColumnName("smallest_word_countas");
+        });
+
+        modelBuilder.Entity<Iter1ExpandedArchEmailsAllIssue>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("expanded_arch_emails_all_issues_pkey");
 
-            entity.ToTable("expanded_arch_emails_all_issues");
+            entity.ToTable("iter1_expanded_arch_emails_all_issues");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("nextval('expanded_arch_emails_all_issues_id_seq'::regclass)")
+                .HasColumnName("id");
             entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
             entity.Property(e => e.EmailDate)
                 .HasColumnType("timestamp without time zone")
@@ -402,13 +238,15 @@ public partial class RelationsDbContext : DbContext
             entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
         });
 
-        modelBuilder.Entity<ExpandedArchIssuesAllEmail>(entity =>
+        modelBuilder.Entity<Iter1ExpandedArchIssuesAllEmail>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("expanded_arch_issues_all_emails_pkey");
 
-            entity.ToTable("expanded_arch_issues_all_emails");
+            entity.ToTable("iter1_expanded_arch_issues_all_emails");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("nextval('expanded_arch_issues_all_emails_id_seq'::regclass)")
+                .HasColumnName("id");
             entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
             entity.Property(e => e.EmailDate)
                 .HasColumnType("timestamp without time zone")
@@ -426,6 +264,148 @@ public partial class RelationsDbContext : DbContext
                 .HasColumnName("issue_modified");
             entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
             entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<Iter2SimExpandedArchEmailsAllIssue>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("sim_expanded_arch_emails_all_issues_pkey");
+
+            entity.ToTable("iter2_sim_expanded_arch_emails_all_issues");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("nextval('sim_expanded_arch_emails_all_issues_id_seq'::regclass)")
+                .HasColumnName("id");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("email_date");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.IssueCreated)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_created");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<Iter2SimExpandedArchIssuesAllEmail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("sim_expanded_arch_issues_all_emails_pkey");
+
+            entity.ToTable("iter2_sim_expanded_arch_issues_all_emails");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("nextval('sim_expanded_arch_issues_all_emails_id_seq'::regclass)")
+                .HasColumnName("id");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("email_date");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
+            entity.Property(e => e.IssueCreated)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("issue_created");
+            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<Iter2UniqueFilteredSimArchEmailsAllIssue>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("unique_filtered_sim_arch_emails_all_issues_pkey");
+
+            entity.ToTable("iter2_unique_filtered_sim_arch_emails_all_issues");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<Iter2UniqueFilteredSimArchIssuesAllEmail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("unique_filtered_sim_arch_issues_all_emails_pkey");
+
+            entity.ToTable("iter2_unique_filtered_sim_arch_issues_all_emails");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<Iter3AverageSimilarityArchEmailsAllIssue>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("iter3_average_similarity_arch_emails_all_issues");
+
+            entity.Property(e => e.AverageSimilarity).HasColumnName("average_similarity");
+            entity.Property(e => e.CosineSimilarity).HasColumnName("cosine_similarity");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.SentenceSimilarity).HasColumnName("sentence_similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<Iter3AverageSimilarityArchIssuesAllEmail>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("iter3_average_similarity_arch_issues_all_emails");
+
+            entity.Property(e => e.AverageSimilarity).HasColumnName("average_similarity");
+            entity.Property(e => e.CosineSimilarity).HasColumnName("cosine_similarity");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.SentenceSimilarity).HasColumnName("sentence_similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<Iter4AverageSimilarityArchIssuesAllEmail>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("iter4_average_similarity_arch_issues_all_emails");
+
+            entity.Property(e => e.AverageSimilarity).HasColumnName("average_similarity");
+            entity.Property(e => e.CosineSimilarity).HasColumnName("cosine_similarity");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.SentenceSimilarity).HasColumnName("sentence_similarity");
             entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
         });
 
@@ -447,6 +427,24 @@ public partial class RelationsDbContext : DbContext
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("issue_created");
             entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
+        modelBuilder.Entity<Iter4CosSimFilteredArchIssuesAllEmail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("iter4_cos_sim_filtered_arch_issues_all_emails_pkey");
+
+            entity.ToTable("iter4_cos_sim_filtered_arch_issues_all_emails");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
             entity.Property(e => e.IssueKey).HasColumnName("issue_key");
             entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
             entity.Property(e => e.Similarity).HasColumnName("similarity");
@@ -500,6 +498,24 @@ public partial class RelationsDbContext : DbContext
             entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
         });
 
+        modelBuilder.Entity<Iter4SenSimFilteredArchIssuesAllEmail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("iter4_sen_sim_filtered_arch_issues_all_emails_pkey");
+
+            entity.ToTable("iter4_sen_sim_filtered_arch_issues_all_emails");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
+        });
+
         modelBuilder.Entity<Iter4SenSimResultArchIssuesAllEmail>(entity =>
         {
             entity.HasKey(e => new { e.IssueKey, e.EmailId }).HasName("iter4_SIM_RESULT_arch_issues_all_emails_pkey");
@@ -519,58 +535,6 @@ public partial class RelationsDbContext : DbContext
                 .HasForeignKey(d => d.IssueKey)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("iter4_SIM_RESULT_arch_issues_all_emails_issue_key_fkey");
-        });
-
-        modelBuilder.Entity<ModifiedArchEmailsAllIssue>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("modified_arch_emails_all_issues_pkey");
-
-            entity.ToTable("modified_arch_emails_all_issues");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueModified)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_modified");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-        });
-
-        modelBuilder.Entity<ModifiedArchIssuesAllEmail>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("modified_arch_issues_all_emails_pkey");
-
-            entity.ToTable("modified_arch_issues_all_emails");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueModified)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_modified");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
         });
 
         modelBuilder.Entity<ResultArchEmailsAllIssue>(entity =>
@@ -615,158 +579,6 @@ public partial class RelationsDbContext : DbContext
                 .HasConstraintName("RESULT_arch_issues_all_emails_issue_key_fkey");
         });
 
-        modelBuilder.Entity<SimArchEmailsAllIssuesWordAndCreationTimeFiltered>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("sim_arch_emails_all_issues_word_and_creation_time_filtered_pkey");
-
-            entity.ToTable("sim_arch_emails_all_issues_word_and_creation_time_filtered");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<SimArchEmailsAllIssuesWordFiltered>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("sim_arch_emails_all_issues_word_filtered_pkey");
-
-            entity.ToTable("sim_arch_emails_all_issues_word_filtered");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<SimArchIssuesAllEmailsWordAndCreationTimeFiltered>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("sim_arch_issues_all_emails_word_and_creation_time_filtered_pkey");
-
-            entity.ToTable("sim_arch_issues_all_emails_word_and_creation_time_filtered");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<SimArchIssuesAllEmailsWordFiltered>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("sim_arch_issues_all_emails_word_filtered_pkey");
-
-            entity.ToTable("sim_arch_issues_all_emails_word_filtered");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<SimExpandedArchEmailsAllIssue>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("sim_expanded_arch_emails_all_issues_pkey");
-
-            entity.ToTable("sim_expanded_arch_emails_all_issues");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<SimExpandedArchIssuesAllEmail>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("sim_expanded_arch_issues_all_emails_pkey");
-
-            entity.ToTable("sim_expanded_arch_issues_all_emails");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailDate)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("email_date");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.EmailWordCount).HasColumnName("email_word_count");
-            entity.Property(e => e.IssueCreated)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("issue_created");
-            entity.Property(e => e.IssueDescriptionWordCount).HasColumnName("issue_description_word_count");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
         modelBuilder.Entity<SimResultArchEmailsAllIssue>(entity =>
         {
             entity.HasKey(e => new { e.IssueKey, e.EmailId }).HasName("SIM_RESULT_arch_emails_all_issues_pkey");
@@ -807,42 +619,6 @@ public partial class RelationsDbContext : DbContext
                 .HasForeignKey(d => d.IssueKey)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("SIM_RESULT_arch_issues_all_emails_issue_key_fkey");
-        });
-
-        modelBuilder.Entity<UniqueFilteredSimArchEmailsAllIssue>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("unique_filtered_sim_arch_emails_all_issues_pkey");
-
-            entity.ToTable("unique_filtered_sim_arch_emails_all_issues");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
-        });
-
-        modelBuilder.Entity<UniqueFilteredSimArchIssuesAllEmail>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("unique_filtered_sim_arch_issues_all_emails_pkey");
-
-            entity.ToTable("unique_filtered_sim_arch_issues_all_emails");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreationTimeDifference).HasColumnName("creation_time_difference");
-            entity.Property(e => e.EmailId).HasColumnName("email_id");
-            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
-            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
-            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
-            entity.Property(e => e.Similarity).HasColumnName("similarity");
-            entity.Property(e => e.SmallestWordCount).HasColumnName("smallest_word_count");
         });
         modelBuilder.HasSequence<int>("expanded_arch_emails_all_issues_id_seq");
         modelBuilder.HasSequence<int>("expanded_arch_issues_all_emails_id_seq");

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace databaseEditor.Models;
 
-public partial class AverageSimilarityArchIssuesAllEmail
+public partial class Iter3AverageSimilarityArchEmailsAllIssue
 {
     public int? Id { get; set; }
 

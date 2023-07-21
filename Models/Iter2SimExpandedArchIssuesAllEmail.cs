@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace databaseEditor.Models;
 
-public partial class ArchEmailsAllIssuesWordFiltered
+public partial class Iter2SimExpandedArchIssuesAllEmail
 {
     public int Id { get; set; }
 
@@ -16,8 +16,6 @@ public partial class ArchEmailsAllIssuesWordFiltered
     public DateTime? EmailDate { get; set; }
 
     public DateTime? IssueCreated { get; set; }
-
-    public DateTime? IssueModified { get; set; }
 
     public int? EmailWordCount { get; set; }
 

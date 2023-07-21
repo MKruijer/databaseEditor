@@ -70,50 +70,24 @@ namespace databaseEditor.Database
 
         #region SharedFunctions
 
-        public static void SetSmallestWordCount(string tableName)
+        public static void ApplyWordCountFilterByRemoval(int wordCountLowerBound, string tableName)
         {
-            Console.Write($"Setting smallest_word_count in {tableName}...");
-            ExecuteSQL($"UPDATE {tableName} SET smallest_word_count = LEAST(issue_description_word_count, email_word_count)").Wait();
-            Console.Write($"\rsmallest_word_count has been set in {tableName}.      \n");
+            Console.Write($"Applying word count filter in table '{tableName}'...");
+            ExecuteSQL($"""
+                DELETE FROM {tableName}
+                WHERE smallest_word_count < {wordCountLowerBound};
+                """).Wait();
+            Console.Write($"\rApplyied word count filter in table '{tableName}'.   \n");
         }
 
-        public static void ApplyWordCountFilterExportAsNewTable(string newTableName, string sourceTableName)
+        public static void ApplyCreationTimeFilterByRemoval(int creationTimeUpperBound, string tableName)
         {
-            Console.Write($"Creating new table '{newTableName}'...");
-            var creationSql = $"""
-                CREATE TABLE IF NOT EXISTS {newTableName} AS 
-                SELECT * FROM {sourceTableName} 
-                WHERE smallest_word_count >= 50;
-                """;
-            ExecuteSQL(creationSql).Wait();
-            var alterSql = $"""
-                ALTER TABLE {newTableName} 
-                ALTER COLUMN email_id SET NOT NULL, 
-                ADD PRIMARY KEY (id), 
-                ALTER COLUMN issue_key SET NOT NULL;
-                """;
-            ExecuteSQL(alterSql).Wait();
-            Console.Write($"\rCreated table '{newTableName}'.      \n");
-        }
-
-        public static void ApplyCreationTimeDifferenceFilterExportAsNewTable(string newTableName, string sourceTableName)
-        {
-            Console.Write($"Creating new table '{newTableName}'...");
-            var creationSql = $"""
-                CREATE TABLE IF NOT EXISTS {newTableName} AS 
-                SELECT * FROM {sourceTableName} 
-                WHERE creation_time_difference <= 500;
-                """;
-            ExecuteSQL(creationSql).Wait();
-            var alterSql = $"""
-                ALTER TABLE {newTableName} 
-                ALTER COLUMN id SET NOT NULL, 
-                ALTER COLUMN email_id SET NOT NULL, 
-                ADD PRIMARY KEY (id), 
-                ALTER COLUMN issue_key SET NOT NULL;
-                """;
-            ExecuteSQL(alterSql).Wait();
-            Console.Write($"\rCreated table 'arch_emails_all_issues_word_and_creation_time_filtered'.      \n");
+            Console.Write($"Applying creation time filter in table '{tableName}'...");
+            ExecuteSQL($"""
+                DELETE FROM {tableName}
+                WHERE creation_time_difference > {creationTimeUpperBound};
+                """).Wait();
+            Console.Write($"\rApplyied creation time filter in table '{tableName}'.   \n");
         }
 
         public static void ApplyDuplicationFilterExportAsNewTable(string newTableName, string sourceTableName)
@@ -209,25 +183,6 @@ namespace databaseEditor.Database
 
 
         #endregion SharedFunctions
-
-        #region Iteration1Functions
-
-        public static void InsertInExpandedTables()
-        {
-            Console.Write("Inserting into tables...");
-            List<String> fillInExpandedTablesSQL = new List<string>()
-                {
-                    "INSERT INTO expanded_arch_emails_all_issues (email_id, issue_key, similarity) " +
-                    "SELECT email_id, issue_key, similarity FROM result_arch_emails_all_issues WHERE similarity > 0.1;",
-
-                    "INSERT INTO expanded_arch_issues_all_emails (email_id, issue_key, similarity)" +
-                    "SELECT email_id, issue_key, similarity FROM result_arch_issues_all_emails WHERE similarity > 0.1;"
-                };
-            fillInExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
-            Console.Write("\rInserted into tables.      \n");
-        }
-
-        #endregion Iteration1Functions
 
         #region Iteration3Functions
 
@@ -330,66 +285,34 @@ namespace databaseEditor.Database
             return listOfJiraIssues;
         }
 
-        public static List<ExpandedArchEmailsAllIssue> GetExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
+        public static List<Iter1ExpandedArchEmailsAllIssue> GetExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
         {
             Console.Write("Loading expanded ArchEmailsAllIssues table...");
-            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.ExpandedArchEmailsAllIssues.ToList();
+            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.Iter1ExpandedArchEmailsAllIssues.ToList();
             Console.Write("\rLoaded expanded ArchEmailsAllIssues table.      \n");
             return listOfExpandedArchEmailsAllIssuesPairs;
         }
 
-        public static List<ExpandedArchIssuesAllEmail> GetExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
+        public static List<Iter1ExpandedArchIssuesAllEmail> GetExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
         {
             Console.Write("Loading expanded ArchIssuesAllEmails table...");
-            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.ExpandedArchIssuesAllEmails.ToList();
+            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.Iter1ExpandedArchIssuesAllEmails.ToList();
             Console.Write("\rLoaded expanded ArchIssuesAllEmails table.      \n");
             return listOfExpandedArchEmailsAllIssuesPairs;
         }
 
-        public static List<ArchEmailsAllIssuesWordAndCreationTimeFiltered> GetMaxFilteredArchEmailAllIssue(RelationsDbContext dbContext)
-        {
-            Console.Write("Loading max filtered ArchIssuesAllEmails table...");
-            var listOfMaxFilteredArchEmailsAllIssuesPairs = dbContext.ArchEmailsAllIssuesWordAndCreationTimeFiltereds.ToList();
-            Console.Write("\rLoaded max filtered ArchIssuesAllEmails table.      \n");
-            return listOfMaxFilteredArchEmailsAllIssuesPairs;
-        }
-
-        public static List<ArchIssuesAllEmailsWordAndCreationTimeFiltered> GetMaxFilteredArchIssueAllEmail(RelationsDbContext dbContext)
-        {
-            Console.Write("Loading max filtered ArchIssuesAllEmails table...");
-            var listOfMaxFilteredArchEmailsAllIssuesPairs = dbContext.ArchIssuesAllEmailsWordAndCreationTimeFiltereds.ToList();
-            Console.Write("\rLoaded max filtered ArchIssuesAllEmails table.      \n");
-            return listOfMaxFilteredArchEmailsAllIssuesPairs;
-        }
-
-        public static List<SimArchEmailsAllIssuesWordAndCreationTimeFiltered> GetSimMaxFilteredArchEmailAllIssue(RelationsDbContext dbContext)
-        {
-            Console.Write("Loading sim max filtered ArchIssuesAllEmails table...");
-            var SimMaxFilteredSimArchEmailsAllIssuesPairs = dbContext.SimArchEmailsAllIssuesWordAndCreationTimeFiltereds.ToList();
-            Console.Write("\rLoaded sim max filtered ArchIssuesAllEmails table.      \n");
-            return SimMaxFilteredSimArchEmailsAllIssuesPairs;
-        }
-
-        public static List<SimArchIssuesAllEmailsWordAndCreationTimeFiltered> GetSimMaxFilteredArchIssueAllEmail(RelationsDbContext dbContext)
-        {
-            Console.Write("Loading sim max filtered ArchIssuesAllEmails table...");
-            var SimMaxFilteredSimArchIssuesAllEmailsPairs = dbContext.SimArchIssuesAllEmailsWordAndCreationTimeFiltereds.ToList();
-            Console.Write("\rLoaded sim max filtered ArchIssuesAllEmails table.      \n");
-            return SimMaxFilteredSimArchIssuesAllEmailsPairs;
-        }
-
-        public static List<SimExpandedArchEmailsAllIssue> GetSimExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
+        public static List<Iter2SimExpandedArchEmailsAllIssue> GetSimExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
         {
             Console.Write("Loading sim_expanded_arch_emails_all_issues table...");
-            var listToReturn = dbContext.SimExpandedArchEmailsAllIssues.ToList();
+            var listToReturn = dbContext.Iter2SimExpandedArchEmailsAllIssues.ToList();
             Console.Write("\rLoaded sim_expanded_arch_emails_all_issues table.      \n");
             return listToReturn;
         }
 
-        public static List<SimExpandedArchIssuesAllEmail> GetSimExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
+        public static List<Iter2SimExpandedArchIssuesAllEmail> GetSimExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
         {
             Console.Write("Loading sim_expanded_arch_issues_all_emails table...");
-            var listToReturn = dbContext.SimExpandedArchIssuesAllEmails.ToList();
+            var listToReturn = dbContext.Iter2SimExpandedArchIssuesAllEmails.ToList();
             Console.Write("\rLoaded sim_expanded_arch_issues_all_emails table.      \n");
             return listToReturn;
         }

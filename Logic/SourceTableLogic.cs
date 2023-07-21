@@ -14,9 +14,14 @@ namespace databaseEditor.Logic
         {
             // Get the base directory of the application
             string currentDirectory = Directory.GetCurrentDirectory();
-            string projectDirectory = Directory.GetParent(currentDirectory).Parent.Parent.FullName;
+            string? projectDirectory = Directory.GetParent(currentDirectory)?.Parent?.Parent?.FullName;
+            if(projectDirectory == null)
+            {
+                Console.WriteLine("Error getting directory.");
+                return;
+            }
             string jsonPath;
-            Dictionary<string, Entry> entries = new Dictionary<string, Entry>();
+            Dictionary<string, Entry>? entries = new Dictionary<string, Entry>();
             // Construct the file path
             try
             {

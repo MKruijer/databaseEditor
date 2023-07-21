@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace databaseEditor.Models;
 
-public partial class UniqueEmailThreadArchEmailAllIssue
+public partial class Iter1AnalysisUniquePairsArchIssuesAllEmail
 {
     public int? Id { get; set; }
 
@@ -13,19 +13,15 @@ public partial class UniqueEmailThreadArchEmailAllIssue
 
     public decimal? Similarity { get; set; }
 
-    public DateTime? EmailDate { get; set; }
+    public int? EmailWordCount { get; set; }
 
-    public DateTime? IssueCreated { get; set; }
+    public int? IssueDescriptionWordCount { get; set; }
 
-    public DateTime? IssueModified { get; set; }
-
-    public int? EmailThreadId { get; set; }
-
-    public long? EmailWordCount { get; set; }
-
-    public long? IssueDescriptionWordCount { get; set; }
+    public int? SmallestWordCountas { get; set; }
 
     public int? CreationTimeDifference { get; set; }
+
+    public int? EmailThreadId { get; set; }
 
     public string? IssueParentKey { get; set; }
 }
