@@ -166,7 +166,7 @@ namespace databaseEditor.Database
                         j.created,
                         e.word_count,
                         j.description_word_count,
-                        LEAST(j.issue_description_word_count, e.email_word_count)
+                        LEAST(j.description_word_count, e.word_count),
                         e.thread_id,
                         j.parent_key
                     FROM
@@ -285,18 +285,18 @@ namespace databaseEditor.Database
             return listOfJiraIssues;
         }
 
-        public static List<Iter1ExpandedArchEmailsAllIssue> GetExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
+        public static List<Iter0ExpandedArchEmailsAllIssue> GetExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
         {
             Console.Write("Loading expanded ArchEmailsAllIssues table...");
-            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.Iter1ExpandedArchEmailsAllIssues.ToList();
+            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.Iter0ExpandedArchEmailsAllIssues.ToList();
             Console.Write("\rLoaded expanded ArchEmailsAllIssues table.      \n");
             return listOfExpandedArchEmailsAllIssuesPairs;
         }
 
-        public static List<Iter1ExpandedArchIssuesAllEmail> GetExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
+        public static List<Iter0ExpandedArchIssuesAllEmail> GetExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
         {
             Console.Write("Loading expanded ArchIssuesAllEmails table...");
-            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.Iter1ExpandedArchIssuesAllEmails.ToList();
+            var listOfExpandedArchEmailsAllIssuesPairs = dbContext.Iter0ExpandedArchIssuesAllEmails.ToList();
             Console.Write("\rLoaded expanded ArchIssuesAllEmails table.      \n");
             return listOfExpandedArchEmailsAllIssuesPairs;
         }

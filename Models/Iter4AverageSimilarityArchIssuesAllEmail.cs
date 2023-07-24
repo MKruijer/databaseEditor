@@ -24,4 +24,6 @@ public partial class Iter4AverageSimilarityArchIssuesAllEmail
     public decimal? CosineSimilarity { get; set; }
 
     public decimal? AverageSimilarity { get; set; }
+
+    public int? Pattern { get; set; }
 }

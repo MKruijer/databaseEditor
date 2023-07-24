@@ -18,9 +18,9 @@ internal class Program
             {
                 EditSourceTableFunctions(db);
             }
-            if (UIFunctions.CheckIfUserWantsToTakeAction("prepare iteration 1"))
+            if (UIFunctions.CheckIfUserWantsToTakeAction("prepare iteration 0"))
             {
-                PrepareIteration1Functions(db);
+                PrepareIteration0Functions(db);
             }
             if (UIFunctions.CheckIfUserWantsToTakeAction("filter iteration 1"))
             {
@@ -75,20 +75,20 @@ internal class Program
         }
     }
 
-    private static void PrepareIteration1Functions(RelationsDbContext db)
+    private static void PrepareIteration0Functions(RelationsDbContext db)
     {
         if (UIFunctions.CheckIfUserWantsToTakeAction("create expanded tables"))
         {
-            DatabaseFunctions.CreateExpandedSimilarityTables("iter1_expanded_arch_issues_all_emails");
-            DatabaseFunctions.CreateExpandedSimilarityTables("iter1_expanded_arch_emails_all_issues");
+            DatabaseFunctions.CreateExpandedSimilarityTables("iter0_expanded_arch_issues_all_emails");
+            DatabaseFunctions.CreateExpandedSimilarityTables("iter0_expanded_arch_emails_all_issues");
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("fill in expanded table"))
         {
+            DatabaseFunctions.InsertInExpandedSimilarityTables("iter0_expanded_arch_emails_all_issues", "result_arch_emails_all_issues", 0.1f);
+            DatabaseFunctions.InsertInExpandedSimilarityTables("iter0_expanded_arch_issues_all_emails", "result_arch_issues_all_emails", 0.1f);
             var listOfExpandedArchEmailsAllIssuesPairs = DatabaseFunctions.GetExpandedArchEmailsAllIssues(db);
             var listOfExpandedArchIssuesAllEmailsPairs = DatabaseFunctions.GetExpandedArchIssuesAllEmails(db);
-            DatabaseFunctions.InsertInExpandedSimilarityTables("iter1_expanded_arch_emails_all_issues", "result_arch_emails_all_issues", 0.1f);
-            DatabaseFunctions.InsertInExpandedSimilarityTables("iter1_expanded_arch_issues_all_emails", "expanded_arch_issues_all_emails", 0.1f);
-            Iter1Logic.FillInCreationTimeDifference(listOfExpandedArchEmailsAllIssuesPairs, listOfExpandedArchIssuesAllEmailsPairs);
+            Iter0Logic.FillInCreationTimeDifference(listOfExpandedArchEmailsAllIssuesPairs, listOfExpandedArchIssuesAllEmailsPairs);
             DatabaseFunctions.SaveDatabase(db);
         }
     }
@@ -97,18 +97,18 @@ internal class Program
     {
         if (UIFunctions.CheckIfUserWantsToTakeAction("apply word limit filter (remove entries with less than 50 words) to expanded table"))
         {
-            DatabaseFunctions.ApplyWordCountFilterByRemoval(50, "iter1_expanded_arch_emails_all_issues");
-            DatabaseFunctions.ApplyWordCountFilterByRemoval(50, "iter1_expanded_arch_issues_all_emails");
+            DatabaseFunctions.ApplyWordCountFilterByRemoval(50, "iter0_expanded_arch_emails_all_issues");
+            DatabaseFunctions.ApplyWordCountFilterByRemoval(50, "iter0_expanded_arch_issues_all_emails");
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("apply creation time difference filter (remove entries with a creation time difference greater than 500 days) to expanded table"))
         {
-            DatabaseFunctions.ApplyCreationTimeFilterByRemoval(500, "iter1_expanded_arch_emails_all_issues");
-            DatabaseFunctions.ApplyCreationTimeFilterByRemoval(500, "iter1_expanded_arch_issues_all_emails");
+            DatabaseFunctions.ApplyCreationTimeFilterByRemoval(500, "iter0_expanded_arch_emails_all_issues");
+            DatabaseFunctions.ApplyCreationTimeFilterByRemoval(500, "iter0_expanded_arch_issues_all_emails");
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("apply duplication filter and export as new tables"))
         {
-            DatabaseFunctions.ApplyDuplicationFilterExportAsNewTable("iter1_unique_filtered_arch_emails_all_issues", "iter1_expanded_arch_emails_all_issues");
-            DatabaseFunctions.ApplyDuplicationFilterExportAsNewTable("iter1_unique_filtered_arch_issues_all_emails", "iter1_expanded_arch_issues_all_emails");
+            DatabaseFunctions.ApplyDuplicationFilterExportAsNewTable("iter1_unique_filtered_arch_emails_all_issues", "iter0_expanded_arch_emails_all_issues");
+            DatabaseFunctions.ApplyDuplicationFilterExportAsNewTable("iter1_unique_filtered_arch_issues_all_emails", "iter0_expanded_arch_issues_all_emails");
         }
     }
 
@@ -121,10 +121,10 @@ internal class Program
         }
         if (UIFunctions.CheckIfUserWantsToTakeAction("fill in expanded table"))
         {
-            var listOfSimExpandedArchEmailsAllIssues = DatabaseFunctions.GetSimExpandedArchEmailsAllIssues(db);
-            var listOfSimExpandedArchIssuesAllEmails = DatabaseFunctions.GetSimExpandedArchIssuesAllEmails(db);
             DatabaseFunctions.InsertInExpandedSimilarityTables("iter2_sim_expanded_arch_emails_all_issues", "sim_result_arch_emails_all_issues", 0.35f);
             DatabaseFunctions.InsertInExpandedSimilarityTables("iter2_sim_expanded_arch_issues_all_emails", "sim_result_arch_issues_all_emails", 0.35f);
+            var listOfSimExpandedArchEmailsAllIssues = DatabaseFunctions.GetSimExpandedArchEmailsAllIssues(db);
+            var listOfSimExpandedArchIssuesAllEmails = DatabaseFunctions.GetSimExpandedArchIssuesAllEmails(db);
             Iter2Logic.RunMultiThreadedFillInCreationTimeDifference(listOfSimExpandedArchEmailsAllIssues, listOfSimExpandedArchIssuesAllEmails, NumberOfThreads);
             DatabaseFunctions.SaveDatabase(db);
         }

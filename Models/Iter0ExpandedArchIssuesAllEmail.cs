@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace databaseEditor.Models;
 
-public partial class Iter1ExpandedArchIssuesAllEmail
+public partial class Iter0ExpandedArchIssuesAllEmail
 {
     public int Id { get; set; }
 
@@ -17,8 +17,6 @@ public partial class Iter1ExpandedArchIssuesAllEmail
 
     public DateTime? IssueCreated { get; set; }
 
-    public DateTime? IssueModified { get; set; }
-
     public int? EmailWordCount { get; set; }
 
     public int? IssueDescriptionWordCount { get; set; }
@@ -30,4 +28,6 @@ public partial class Iter1ExpandedArchIssuesAllEmail
     public string? IssueParentKey { get; set; }
 
     public int? CreationTimeDifference { get; set; }
+
+    public int? Pattern { get; set; }
 }

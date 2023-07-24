@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace databaseEditor.Logic
 {
-    public static class Iter1Logic
+    public static class Iter0Logic
     {
-        public static void FillInCreationTimeDifference(List<Iter1ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
-                                                               List<Iter1ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs)
+        public static void FillInCreationTimeDifference(List<Iter0ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs,
+                                                               List<Iter0ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs)
         {    
             FillInCreationTimeDifference(listOfExpandedArchEmailsAllIssuesPairs);
             FillInCreationTimeDifference(listOfExpandedArchIssuesAllEmailsPairs);
         }
         
-        private static void FillInCreationTimeDifference(List<Iter1ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs)
+        private static void FillInCreationTimeDifference(List<Iter0ExpandedArchEmailsAllIssue> listOfExpandedArchEmailsAllIssuesPairs)
         {
             var totalAmountOfPairs = listOfExpandedArchEmailsAllIssuesPairs.Count();
             int currentAmountOfPairsDone = 0;
@@ -41,7 +41,7 @@ namespace databaseEditor.Logic
             Console.WriteLine();
         }
 
-        private static void FillInCreationTimeDifference(List<Iter1ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs)
+        private static void FillInCreationTimeDifference(List<Iter0ExpandedArchIssuesAllEmail> listOfExpandedArchIssuesAllEmailsPairs)
         {
             var totalAmountOfPairs = listOfExpandedArchIssuesAllEmailsPairs.Count();
             int currentAmountOfPairsDone = 0;

@@ -20,4 +20,6 @@ public partial class Iter2UniqueFilteredSimArchIssuesAllEmail
     public int? EmailThreadId { get; set; }
 
     public string? IssueParentKey { get; set; }
+
+    public int? Pattern { get; set; }
 }
