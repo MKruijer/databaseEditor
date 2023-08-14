@@ -23,4 +23,4 @@ For iteration 4 the following tables are also required since there are new cosin
 - iter4_sen_sim_result_arch_issues_all_emails (contains SBERT cosine results)
 - iter4_cos_sim_result_arch_issues_all_emails(contains SBERT cosine results)
 
-If you got the data_email_email table from the abovely mentioned paper, you can include the ADD type to the table by applying the script which can be found in AddADDTypeToEmails.txt 
+If you got the data_email_email table from the abovely mentioned paper, you can include the ADD type to the table by applying the script which can be found in textFiles/AddADDTypeToEmails.txt 
