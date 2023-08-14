@@ -10,6 +10,8 @@ internal class Program
 {
     private const int NumberOfThreads = 11;
 
+    public const string ConnectionString = "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword";
+
     static void Main(string[] args)
     {
         using (var db = DatabaseFunctions.GetPostgresContext())

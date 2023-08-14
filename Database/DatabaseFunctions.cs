@@ -32,7 +32,7 @@ namespace databaseEditor.Database
         private static async Task ExecuteSQL(string sql)
         {
             var con = new NpgsqlConnection(
-                        connectionString: "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
+                        connectionString: Program.ConnectionString);
             con.Open();
             var command = new NpgsqlCommand()
             {
@@ -49,7 +49,7 @@ namespace databaseEditor.Database
         public static NpgsqlConnection GetPostgresConnection()
         {
             var con = new NpgsqlConnection(
-                        connectionString: "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
+                        connectionString: Program.ConnectionString);
             con.Open();
             return con;
         }
