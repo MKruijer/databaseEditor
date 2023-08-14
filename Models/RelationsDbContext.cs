@@ -17,8 +17,6 @@ public partial class RelationsDbContext : DbContext
 
     public virtual DbSet<DataEmailEmail> DataEmailEmails { get; set; }
 
-    public virtual DbSet<DataEmailTag> DataEmailTags { get; set; }
-
     public virtual DbSet<DataJiraJiraIssue> DataJiraJiraIssues { get; set; }
 
     public virtual DbSet<DataJiraJiraIssueComment> DataJiraJiraIssueComments { get; set; }
@@ -67,6 +65,8 @@ public partial class RelationsDbContext : DbContext
 
     public virtual DbSet<UniquePair> UniquePairs { get; set; }
 
+    public virtual DbSet<UniquePairsAllAdd> UniquePairsAllAdds { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseNpgsql("Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword");
@@ -92,45 +92,15 @@ public partial class RelationsDbContext : DbContext
                 .HasColumnName("date");
             entity.Property(e => e.Hidden).HasColumnName("hidden");
             entity.Property(e => e.InReplyTo).HasColumnName("in_reply_to");
+            entity.Property(e => e.IsExecutive).HasColumnName("is_executive");
+            entity.Property(e => e.IsExistence).HasColumnName("is_existence");
+            entity.Property(e => e.IsProperty).HasColumnName("is_property");
             entity.Property(e => e.MessageId).HasColumnName("message_id");
             entity.Property(e => e.ParentId).HasColumnName("parent_id");
             entity.Property(e => e.SentFrom).HasColumnName("sent_from");
             entity.Property(e => e.Subject).HasColumnName("subject");
             entity.Property(e => e.ThreadId).HasColumnName("thread_id");
             entity.Property(e => e.WordCount).HasColumnName("word_count");
-
-            entity.HasMany(d => d.Tags).WithMany(p => p.Emails)
-                .UsingEntity<Dictionary<string, object>>(
-                    "DataEmailEmailTag",
-                    r => r.HasOne<DataEmailTag>().WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("email_tag_tag_id_fkey"),
-                    l => l.HasOne<DataEmailEmail>().WithMany()
-                        .HasForeignKey("EmailId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("email_tag_email_id_fkey"),
-                    j =>
-                    {
-                        j.HasKey("EmailId", "TagId").HasName("email_tag_pkey");
-                        j.ToTable("data_email_email_tag");
-                        j.IndexerProperty<int>("EmailId").HasColumnName("email_id");
-                        j.IndexerProperty<int>("TagId").HasColumnName("tag_id");
-                    });
-        });
-
-        modelBuilder.Entity<DataEmailTag>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("tag_pkey");
-
-            entity.ToTable("data_email_tag");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("nextval('tag_id_seq'::regclass)")
-                .HasColumnName("id");
-            entity.Property(e => e.Architectural).HasColumnName("architectural");
-            entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.Name).HasColumnName("name");
         });
 
         modelBuilder.Entity<DataJiraJiraIssue>(entity =>
@@ -630,6 +600,26 @@ public partial class RelationsDbContext : DbContext
 
             entity.Property(e => e.EmailId).HasColumnName("email_id");
             entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.IsCatExecutive).HasColumnName("is_cat_executive");
+            entity.Property(e => e.IsCatExistence).HasColumnName("is_cat_existence");
+            entity.Property(e => e.IsCatProperty).HasColumnName("is_cat_property");
+            entity.Property(e => e.IssueKey).HasColumnName("issue_key");
+            entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
+            entity.Property(e => e.Pattern).HasColumnName("pattern");
+            entity.Property(e => e.Similarity).HasColumnName("similarity");
+        });
+
+        modelBuilder.Entity<UniquePairsAllAdd>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("unique_pairs_all_add");
+
+            entity.Property(e => e.EmailId).HasColumnName("email_id");
+            entity.Property(e => e.EmailThreadId).HasColumnName("email_thread_id");
+            entity.Property(e => e.IsCatExecutive).HasColumnName("is_cat_executive");
+            entity.Property(e => e.IsCatExistence).HasColumnName("is_cat_existence");
+            entity.Property(e => e.IsCatProperty).HasColumnName("is_cat_property");
             entity.Property(e => e.IssueKey).HasColumnName("issue_key");
             entity.Property(e => e.IssueParentKey).HasColumnName("issue_parent_key");
             entity.Property(e => e.Pattern).HasColumnName("pattern");
@@ -641,8 +631,6 @@ public partial class RelationsDbContext : DbContext
         modelBuilder.HasSequence<int>("iter0_expanded_arch_issues_all_emails_id_seq");
         modelBuilder.HasSequence<int>("iter4_cos_sim_expanded_arch_issues_all_emails_id_seq");
         modelBuilder.HasSequence<int>("iter4_sim_expanded_arch_issues_all_emails_id_seq");
-        modelBuilder.HasSequence<int>("modified_arch_emails_all_issues_id_seq");
-        modelBuilder.HasSequence<int>("modified_arch_issues_all_emails_id_seq");
         modelBuilder.HasSequence<int>("sim_expanded_arch_emails_all_issues_id_seq");
         modelBuilder.HasSequence<int>("sim_expanded_arch_issues_all_emails_id_seq");
 

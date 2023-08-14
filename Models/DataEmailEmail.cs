@@ -32,6 +32,12 @@ public partial class DataEmailEmail
 
     public int? WordCount { get; set; }
 
+    public bool? IsExistence { get; set; }
+
+    public bool? IsExecutive { get; set; }
+
+    public bool? IsProperty { get; set; }
+
     public virtual ICollection<Iter4CosSimResultArchIssuesAllEmail> Iter4CosSimResultArchIssuesAllEmails { get; set; } = new List<Iter4CosSimResultArchIssuesAllEmail>();
 
     public virtual ICollection<Iter4SenSimResultArchIssuesAllEmail> Iter4SenSimResultArchIssuesAllEmails { get; set; } = new List<Iter4SenSimResultArchIssuesAllEmail>();
@@ -43,6 +49,4 @@ public partial class DataEmailEmail
     public virtual ICollection<SimResultArchEmailsAllIssue> SimResultArchEmailsAllIssues { get; set; } = new List<SimResultArchEmailsAllIssue>();
 
     public virtual ICollection<SimResultArchIssuesAllEmail> SimResultArchIssuesAllEmails { get; set; } = new List<SimResultArchIssuesAllEmail>();
-
-    public virtual ICollection<DataEmailTag> Tags { get; set; } = new List<DataEmailTag>();
 }

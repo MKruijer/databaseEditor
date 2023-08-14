@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace databaseEditor.Models;
 
-public partial class UniquePair
+public partial class UniquePairsAllAdd
 {
     public int? EmailId { get; set; }
 
