@@ -1,1 +1,1 @@
-Scaffold-DbContext "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword" Npgsql.EntityFrameworkCore.PostgreSQL -o Models
+Scaffold-DbContext "Host=localhost;Database=relationsDB;Username=postgres;Password=UnsavePassword" Npgsql.EntityFrameworkCore.PostgreSQL -o Models -f
