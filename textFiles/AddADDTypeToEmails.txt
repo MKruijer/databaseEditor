@@ -1,0 +1,22 @@
+alter table data_email_email
+    add is_existence bool;
+
+alter table data_email_email
+    add is_executive bool;
+
+alter table data_email_email
+    add is_property bool;
+
+UPDATE data_email_email AS e
+SET
+    is_existence = CASE WHEN EXISTS (
+        SELECT 1 FROM data_email_email_tag et WHERE et.email_id = e.id AND et.tag_id IN (1, 2, 3)
+    ) THEN TRUE ELSE FALSE END,
+    
+    is_executive = CASE WHEN EXISTS (
+        SELECT 1 FROM data_email_email_tag et WHERE et.email_id = e.id AND et.tag_id IN (9, 4)
+    ) THEN TRUE ELSE FALSE END,
+    
+    is_property = CASE WHEN EXISTS (
+        SELECT 1 FROM data_email_email_tag et WHERE et.email_id = e.id AND et.tag_id = 116
+    ) THEN TRUE ELSE FALSE END;
