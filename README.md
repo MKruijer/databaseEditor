@@ -6,16 +6,21 @@ This tool is designed to update the database and use it to finalize the cosine s
 ## Dependency
 This code is build upon the results we get using the python scripts that can be found here:
 https://github.com/MKruijer/PythonSimilarityCode
+We did run the scripts multiple times for different iterations, so changing the table names is advisable.
 
 
 ## Before running
 Before running the program, make sure that you update the ConnectionString in Program.cs. It should point to a database with the following tables:
-- data_email_email
-- data_jira_jira_issue
-- data_jira_jira_issue_comment
-- result_arch_emails_all_issues
-- result_arch_issues_all_emails
-- sim_result_arch_emails_all_issues
-- sim_result_arch_issues_all_emails
+- data_email_email (contains email data)
+- data_jira_jira_issue (contains issue data)
+- data_jira_jira_issue_comment (contains issue comments data)
+- result_arch_emails_all_issues (contains TF-IDF cosine results)
+- result_arch_issues_all_emails (contains TF-IDF cosine results)
+- sim_result_arch_emails_all_issues (contains SBERT cosine results)
+- sim_result_arch_issues_all_emails (contains SBERT cosine results)
 
-If you got the data_email_email table from the abovely mentioned paper, apply the script which can be found in AddADDTypeToEmails.txt 
+For iteration 4 the following tables are also required since there are new cosine values:
+- iter4_sen_sim_result_arch_issues_all_emails (contains SBERT cosine results)
+- iter4_cos_sim_result_arch_issues_all_emails(contains SBERT cosine results)
+
+If you got the data_email_email table from the abovely mentioned paper, you can include the ADD type to the table by applying the script which can be found in AddADDTypeToEmails.txt 
