@@ -29,6 +29,12 @@ namespace databaseEditor.Database
             Console.Write("\rDB changes succesfully saved.\n");
         }
 
+        /// <summary>
+        /// Method to execute sql directly to the database using the connection string configured in Program.cs.
+        /// Function is private in order to get a better maintainability on all SQL usage.
+        /// </summary>
+        /// <param name="sql">the sql to be executed</param>
+        /// <returns></returns>
         private static async Task ExecuteSQL(string sql)
         {
             var con = new NpgsqlConnection(
@@ -40,8 +46,18 @@ namespace databaseEditor.Database
                 CommandText = sql,
                 CommandTimeout = 300
             };
-            await command.ExecuteNonQueryAsync();
-            con.Close();
+            try
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
         }
 
         #region UpdateFunctions
@@ -90,40 +106,26 @@ namespace databaseEditor.Database
             Console.Write($"\rApplyied creation time filter in table '{tableName}'.   \n");
         }
 
-        public static void ApplyDuplicationFilterExportAsNewTable(string newTableName, string sourceTableName)
+        public static void ApplyDuplicationFilterByRemoval(string tableName)
         {
-            Console.Write($"Creating new table '{newTableName}'...");
+            Console.Write($"Applying duplication filter in table '{tableName}'...");
             ExecuteSQL($"""
-                CREATE TABLE {newTableName} AS
-                SELECT t.id, t.email_id, t.issue_key, t.similarity, t.smallest_word_count, t.creation_time_difference, t.email_thread_id, t.issue_parent_key
-                FROM (
-                  SELECT email_thread_id, issue_parent_key, MAX(similarity) AS max_similarity
-                  FROM {sourceTableName}
-                  GROUP BY email_thread_id, issue_parent_key
-                ) AS subq
-                JOIN {sourceTableName} AS t
-                  ON t.email_thread_id = subq.email_thread_id
-                  AND t.issue_parent_key = subq.issue_parent_key
-                  AND t.similarity = subq.max_similarity
-                ORDER BY t.similarity DESC;
+                DELETE FROM {tableName}
+                WHERE (email_thread_id, issue_parent_key, similarity) NOT IN (
+                    SELECT email_thread_id, issue_parent_key, MAX(similarity) AS max_similarity
+                    FROM {tableName}
+                    GROUP BY email_thread_id, issue_parent_key);
                 """).Wait();
-            ExecuteSQL($"""
-                ALTER TABLE {newTableName}
-                ALTER COLUMN id SET NOT NULL,
-                ALTER COLUMN email_id SET NOT NULL,
-                ALTER COLUMN issue_key SET NOT NULL,
-                ADD PRIMARY KEY (id);
-                """).Wait();
-            Console.Write($"\rCreated table '{newTableName}'.      \n");
+            Console.Write($"\rApplyied duplication filter in table '{tableName}'.   \n");
         }
 
         /// <summary>
         /// Creates a new table with extra columns which are required for filtering
         /// </summary>
         /// <param name="newTableName">Name of the new table</param>
-        public static void CreateExpandedSimilarityTables(string newTableName)
+        public static void CreateExpandedSimilarityTable(string newTableName)
         {
-            Console.Write("Creating tables...");
+            Console.Write("Creating table...");
             List<String> createExpandedTablesSQL = new List<string>()
                 {
                     $"CREATE SEQUENCE IF NOT EXISTS {newTableName}_id_seq AS integer;",
@@ -143,7 +145,16 @@ namespace databaseEditor.Database
                         " creation_time_difference integer);",
                 };
             createExpandedTablesSQL.ForEach(queryString => ExecuteSQL(queryString).Wait());
-            Console.Write("\rCreated tables.      \n");
+            Console.Write("\rCreated table.      \n");
+        }
+
+        public static void CopyTable(string newTableName, string sourceTableName)
+        {
+            Console.Write("Creating table...");
+            ExecuteSQL($"""
+                CREATE TABLE IF NOT EXISTS {newTableName} as SELECT * FROM {sourceTableName}
+                """).Wait();
+            Console.Write("\rCreated table.      \n");
         }
 
         /// <summary>
@@ -154,7 +165,7 @@ namespace databaseEditor.Database
         /// <param name="similarityThreshold">Get pairs with a similarity score above this threshold</param>
         public static void InsertInExpandedSimilarityTables(string targetTableName, string sourceTableName, float similarityThreshold)
         {
-            Console.Write("Inserting into tables...");
+            Console.Write($"Inserting into {targetTableName} table...");
             var fillInExpandedTablesSQL =
                 $"""
                     INSERT INTO {targetTableName} (email_id, issue_key, similarity, email_date, issue_created, email_word_count, issue_description_word_count, smallest_word_count, email_thread_id, issue_parent_key)
@@ -178,7 +189,7 @@ namespace databaseEditor.Database
                     
                     """;
             ExecuteSQL(fillInExpandedTablesSQL).Wait(TimeSpan.FromSeconds(300));
-            Console.Write("\rInserted into tables.      \n");
+            Console.Write($"\rInserted into {targetTableName} table.      \n");
         }
 
 
@@ -285,7 +296,7 @@ namespace databaseEditor.Database
             return listOfJiraIssues;
         }
 
-        public static List<Iter0ExpandedArchEmailsAllIssue> GetExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
+        public static List<Iter0ExpandedArchEmailsAllIssue> GetIter0ExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
         {
             Console.Write("Loading expanded ArchEmailsAllIssues table...");
             var listOfExpandedArchEmailsAllIssuesPairs = dbContext.Iter0ExpandedArchEmailsAllIssues.ToList();
@@ -293,7 +304,7 @@ namespace databaseEditor.Database
             return listOfExpandedArchEmailsAllIssuesPairs;
         }
 
-        public static List<Iter0ExpandedArchIssuesAllEmail> GetExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
+        public static List<Iter0ExpandedArchIssuesAllEmail> GetIter0ExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
         {
             Console.Write("Loading expanded ArchIssuesAllEmails table...");
             var listOfExpandedArchEmailsAllIssuesPairs = dbContext.Iter0ExpandedArchIssuesAllEmails.ToList();
@@ -301,18 +312,18 @@ namespace databaseEditor.Database
             return listOfExpandedArchEmailsAllIssuesPairs;
         }
 
-        public static List<Iter2SimExpandedArchEmailsAllIssue> GetSimExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
+        public static List<Iter2ExpandedArchEmailsAllIssue> GetIter2ExpandedArchEmailsAllIssues(RelationsDbContext dbContext)
         {
             Console.Write("Loading sim_expanded_arch_emails_all_issues table...");
-            var listToReturn = dbContext.Iter2SimExpandedArchEmailsAllIssues.ToList();
+            var listToReturn = dbContext.Iter2ExpandedArchEmailsAllIssues.ToList();
             Console.Write("\rLoaded sim_expanded_arch_emails_all_issues table.      \n");
             return listToReturn;
         }
 
-        public static List<Iter2SimExpandedArchIssuesAllEmail> GetSimExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
+        public static List<Iter2ExpandedArchIssuesAllEmail> GetIter2ExpandedArchIssuesAllEmails(RelationsDbContext dbContext)
         {
             Console.Write("Loading sim_expanded_arch_issues_all_emails table...");
-            var listToReturn = dbContext.Iter2SimExpandedArchIssuesAllEmails.ToList();
+            var listToReturn = dbContext.Iter2ExpandedArchIssuesAllEmails.ToList();
             Console.Write("\rLoaded sim_expanded_arch_issues_all_emails table.      \n");
             return listToReturn;
         }

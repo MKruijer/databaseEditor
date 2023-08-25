@@ -11,8 +11,14 @@ namespace databaseEditor.Logic
 {
     public static class Iter2Logic
     {
-        public static void RunMultiThreadedFillInCreationTimeDifference(List<Iter2SimExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
-                                                        List<Iter2SimExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails,
+        /// <summary>
+        /// Fills in the creation time difference using multiple threads. Using more than 1 thread can cause UI issues during calculations.
+        /// </summary>
+        /// <param name="listOfSimExpandedArchEmailsAllIssues"></param>
+        /// <param name="listOfSimExpandedArchIssuesAllEmails"></param>
+        /// <param name="threadCount">The amount of threads to be used. Using more than 1 can cause UI issues during calculations.</param>
+        public static void RunMultiThreadedFillInCreationTimeDifference(List<Iter2ExpandedArchEmailsAllIssue> listOfSimExpandedArchEmailsAllIssues,
+                                                        List<Iter2ExpandedArchIssuesAllEmail> listOfSimExpandedArchIssuesAllEmails,
                                                         int threadCount)
         {
             // Divide the list sizes to determine the chunk size per thread
@@ -33,7 +39,7 @@ namespace databaseEditor.Logic
             });
         }
 
-        private static void FillInCreationTimeDifference(List<Iter2SimExpandedArchEmailsAllIssue> simExpandedArchEmailsAllIssuesPairs)
+        private static void FillInCreationTimeDifference(List<Iter2ExpandedArchEmailsAllIssue> simExpandedArchEmailsAllIssuesPairs)
         {
             var totalAmountOfPairs = simExpandedArchEmailsAllIssuesPairs.Count();
             int currentAmountOfPairsDone = 0;
@@ -57,7 +63,7 @@ namespace databaseEditor.Logic
             Console.WriteLine();
         }
 
-        private static void FillInCreationTimeDifference(List<Iter2SimExpandedArchIssuesAllEmail> simExpandedArchIssuesAllEmailsPairs)
+        private static void FillInCreationTimeDifference(List<Iter2ExpandedArchIssuesAllEmail> simExpandedArchIssuesAllEmailsPairs)
         {
             var totalAmountOfPairs = simExpandedArchIssuesAllEmailsPairs.Count();
             int currentAmountOfPairsDone = 0;

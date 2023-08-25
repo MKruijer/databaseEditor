@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace databaseEditor.Models;
 
-public partial class Iter2SimExpandedArchEmailsAllIssue
+public partial class Iter2ExpandedArchIssuesAllEmail
 {
     public int Id { get; set; }
 
