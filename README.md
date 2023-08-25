@@ -1,6 +1,6 @@
 # DatabaseEditor
 
-This tool is designed to update the database and use it to finalize the cosine similarity iterations. It is build upon the database created by Bjorn et al, the paper can be found Here: https://julianpasveer.com/Relate_architectural_issues_and_emails_in_mailing_lists%20(2).pdf
+This tool is designed to update the database and use it to finalize the cosine similarity iterations. It is build upon the database created by Pasveer et al, the paper can be found Here: https://julianpasveer.com/Relate_architectural_issues_and_emails_in_mailing_lists%20(2).pdf
 
 
 ## Dependency
